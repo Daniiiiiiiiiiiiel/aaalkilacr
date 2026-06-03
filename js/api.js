@@ -6,29 +6,20 @@
 //  Responsabilidad única: todas las llamadas HTTP viven aquí.
 //  El resto de archivos nunca usan fetch directamente.
 //
-//  ┌─ MODO MOCK (MOCK = true) ──────────────────────────────────────────────┐
-//  │  Simula las respuestas del servidor con un pequeño delay artificial.   │
-//  │  Útil mientras el backend no está listo.                               │
-//  │  Código OTP de prueba: 123456                                          │
-//  │  Cambiar MOCK = false y ajustar API_BASE cuando el backend esté listo. │
-//  └───────────────────────────────────────────────────────────────────────-┘
+//  Cambiar API_BASE por la URL real del backend antes de desplegar.
 // ══════════════════════════════════════════════════════════════════════════════
 
-const MOCK     = true;                    // ← cambiar a false en producción
-const API_BASE = 'https://api.alkila.cr/v1'; // ← URL real del backend
-
-// Simula latencia de red (solo en MOCK).
-const delay = ms => new Promise(r => setTimeout(r, ms));
+const API_BASE = 'https://api.alkila.cr/v1'; // ← URL base del backend
 
 
 // ── TOKEN ─────────────────────────────────────────────────────────────────────
 //
-//  Problema original: el token se guardaba en localStorage pero nunca se usaba.
-//  Solución: saveToken() decide dónde guardarlo según "Recuérdame",
-//            y getToken() lo busca en ambos almacenes.
+//  saveToken() decide dónde guardar el JWT según "Recuérdame":
+//    localStorage   → persiste aunque el usuario cierre el navegador (sesión larga)
+//    sessionStorage → se borra al cerrar la pestaña/navegador   (sesión corta)
 //
-//  localStorage   → persiste aunque el usuario cierre el navegador (sesión larga)
-//  sessionStorage → se borra al cerrar la pestaña/navegador   (sesión corta)
+//  getToken() lo busca en ambos almacenes para usarlo en peticiones protegidas.
+//  clearToken() lo elimina de ambos al hacer logout.
 
 function saveToken(token, remember) {
     if (remember) {
@@ -39,22 +30,21 @@ function saveToken(token, remember) {
 }
 
 function getToken() {
-    // Busca primero en localStorage; si no hay, en sessionStorage.
     return localStorage.getItem('token') || sessionStorage.getItem('token') || null;
 }
 
 function clearToken() {
-    localStorage.removeItem('token');   // limpia ambos al hacer logout
+    localStorage.removeItem('token');
     sessionStorage.removeItem('token');
 }
 
 
 // ── authFetch ─────────────────────────────────────────────────────────────────
 //
-//  Wrapper sobre fetch que añade automáticamente el header de autorización.
-//  Usar para CUALQUIER endpoint protegido (dashboard, perfil, listings, etc.).
+//  Wrapper sobre fetch que adjunta automáticamente el JWT en el header
+//  Authorization: Bearer <token>.
 //
-//  Backend espera:  Authorization: Bearer <jwt-token>
+//  Usar para CUALQUIER endpoint protegido (dashboard, perfil, listings, etc.).
 //  El token fue emitido por el servidor en el login y guardado por saveToken().
 
 async function authFetch(endpoint, options = {}) {
@@ -79,23 +69,9 @@ async function authFetch(endpoint, options = {}) {
 //           401     → { message: string }  (credenciales incorrectas)
 //           400     → { message: string }  (campos inválidos)
 //
-//  Si el login es exitoso:
-//    - Guarda el token según "remember" (ver saveToken).
-//    - Redirige a /dashboard.
+//  Si el login es exitoso guarda el token (según "remember") y redirige al dashboard.
 
 async function loginUser(email, password, remember) {
-    if (MOCK) {
-        await delay(900); // simula latencia
-        // Validación mock: email válido + contraseña de al menos 8 caracteres → éxito
-        if (!email.includes('@') || password.length < 8) {
-            throw new Error('Credenciales incorrectas. Verifica tu email y contraseña.');
-        }
-        saveToken('mock-jwt-token-abc123', remember);
-        window.location.href = '/dashboard'; // en real también redirige aquí
-        return;
-    }
-
-    // ── REAL ──────────────────────────────────────────────────────────────────
     const res  = await fetch(`${API_BASE}/auth/login`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -104,7 +80,7 @@ async function loginUser(email, password, remember) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión.');
     saveToken(data.token, remember);
-    window.location.href = '/dashboard';
+    window.location.href = '/dashboard'; // redirige al dashboard tras login exitoso
 }
 
 
@@ -113,19 +89,12 @@ async function loginUser(email, password, remember) {
 //  POST /auth/forgot-password
 //
 //  Envía:   { email: string }
-//  Espera:  200 OK  → {} (vacío; el servidor ya mandó el correo)
+//  Espera:  200 OK  → {} (vacío; el servidor ya mandó el correo con el OTP)
 //           404     → { message: string }  (email no registrado)
 //
-//  No devuelve nada. Si falla, lanza un Error que app.js captura.
+//  No devuelve nada. Si falla, lanza un Error que app.js captura y muestra inline.
 
 async function sendResetEmail(email) {
-    if (MOCK) {
-        await delay(700);
-        // En mock siempre tiene éxito (cualquier email "existe")
-        return;
-    }
-
-    // ── REAL ──────────────────────────────────────────────────────────────────
     const res = await fetch(`${API_BASE}/auth/forgot-password`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -144,20 +113,12 @@ async function sendResetEmail(email) {
 //
 //  Envía:   { email: string, otp: string }  (otp = 6 dígitos como string)
 //  Espera:  200 OK  → { verified: true }
-//           400     → { verified: false, message: string }  (código incorrecto)
+//           400     → { verified: false, message: string }  (código incorrecto o expirado)
 //
-//  El backend verifica que el código coincida con el enviado al email
+//  El backend verifica que el OTP coincida con el enviado al email
 //  y que no haya expirado (normalmente 10–15 min de validez).
 
 async function verifyOtp(email, otp) {
-    if (MOCK) {
-        await delay(700);
-        // Código correcto de prueba: 123456
-        if (otp !== '123456') throw new Error('Código incorrecto. Intenta de nuevo.');
-        return;
-    }
-
-    // ── REAL ──────────────────────────────────────────────────────────────────
     const res  = await fetch(`${API_BASE}/auth/verify-otp`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -179,12 +140,6 @@ async function verifyOtp(email, otp) {
 //  El backend invalida el OTP usado y actualiza la contraseña del usuario.
 
 async function resetPassword(email, password) {
-    if (MOCK) {
-        await delay(800);
-        return; // siempre éxito en mock
-    }
-
-    // ── REAL ──────────────────────────────────────────────────────────────────
     const res = await fetch(`${API_BASE}/auth/reset-password`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
