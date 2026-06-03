@@ -18,8 +18,8 @@ const API_BASE = 'https://api.alkila.cr/v1'; // ← URL base del backend
 //    localStorage   → persiste aunque el usuario cierre el navegador (sesión larga)
 //    sessionStorage → se borra al cerrar la pestaña/navegador   (sesión corta)
 //
-//  getToken() lo busca en ambos almacenes para usarlo en peticiones protegidas.
-//  clearToken() lo elimina de ambos al hacer logout.
+//  getToken()   → lo busca en ambos almacenes.
+//  clearToken() → lo elimina de ambos (usar en logout).
 
 function saveToken(token, remember) {
     if (remember) {
@@ -39,24 +39,96 @@ function clearToken() {
 }
 
 
+// ── safeFetch ─────────────────────────────────────────────────────────────────
+//
+//  Envuelve fetch en un try/catch para traducir errores de red (sin internet,
+//  servidor caído, DNS fallido) en un mensaje legible para el usuario.
+//
+//  fetch lanza un TypeError cuando no hay conexión. Sin este wrapper, el catch
+//  de app.js recibiría "Failed to fetch", que el usuario no entendería.
+
+async function safeFetch(url, options = {}) {
+    try {
+        return await fetch(url, options);
+    } catch {
+        // TypeError: Failed to fetch → sin conexión o servidor inalcanzable
+        throw new Error('Sin conexión. Verificá tu internet e intentá de nuevo.');
+    }
+}
+
+
+// ── tryRefreshToken ───────────────────────────────────────────────────────────
+//
+//  POST /auth/refresh-token
+//
+//  Envía:   { token: string }  (el JWT actual, aunque haya expirado)
+//  Espera:  200 OK  → { token: string }  (nuevo JWT válido)
+//           401     → {}  (el refresh token también expiró → hay que volver a hacer login)
+//
+//  Uso interno de authFetch: el usuario nunca llama esta función directamente.
+//  Si el refresh falla, borra el token viejo y redirige al login.
+
+async function tryRefreshToken() {
+    const token = getToken();
+    if (!token) return false; // no hay token que refrescar
+
+    try {
+        const res = await fetch(`${API_BASE}/auth/refresh-token`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ token }),
+        });
+        if (!res.ok) return false; // el servidor rechazó el refresh
+
+        const data    = await res.json();
+        const remember = !!localStorage.getItem('token'); // mantiene la preferencia original
+        saveToken(data.token, remember);
+        return true; // token renovado exitosamente
+    } catch {
+        return false; // error de red durante el refresh
+    }
+}
+
+
 // ── authFetch ─────────────────────────────────────────────────────────────────
 //
-//  Wrapper sobre fetch que adjunta automáticamente el JWT en el header
-//  Authorization: Bearer <token>.
+//  Wrapper sobre safeFetch para peticiones autenticadas (rutas protegidas).
+//  Adjunta automáticamente el JWT en Authorization: Bearer <token>.
 //
-//  Usar para CUALQUIER endpoint protegido (dashboard, perfil, listings, etc.).
-//  El token fue emitido por el servidor en el login y guardado por saveToken().
+//  Flujo cuando el servidor responde 401 (token expirado):
+//    1. Llama a tryRefreshToken() para obtener un nuevo JWT.
+//    2. Si logra renovarlo → reintenta la petición original con el nuevo token.
+//    3. Si no puede renovar → borra el token y redirige al login.
+//       El usuario tendrá que autenticarse de nuevo. Esto es el comportamiento
+//       correcto: la sesión expiró por completo.
+//
+//  El parámetro _retry evita bucles infinitos: si el reintento también da 401,
+//  se corta el ciclo y se desloguea al usuario.
 
-async function authFetch(endpoint, options = {}) {
+async function authFetch(endpoint, options = {}, _retry = false) {
     const token = getToken();
-    return fetch(`${API_BASE}${endpoint}`, {
+    const res   = await safeFetch(`${API_BASE}${endpoint}`, {
         ...options,
         headers: {
             'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {}), // adjunta token si existe
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
             ...options.headers, // permite sobrescribir headers desde el llamador
         },
     });
+
+    // Si el servidor rechaza por token expirado y no es ya un reintento:
+    if (res.status === 401 && !_retry) {
+        const refreshed = await tryRefreshToken();
+        if (refreshed) {
+            return authFetch(endpoint, options, true); // reintenta con el nuevo token
+        }
+        // No se pudo renovar → sesión caducada por completo
+        clearToken();
+        window.location.href = '/'; // redirige al login
+        return res; // no se usa, pero evita que el llamador explote
+    }
+
+    return res;
 }
 
 
@@ -69,18 +141,19 @@ async function authFetch(endpoint, options = {}) {
 //           401     → { message: string }  (credenciales incorrectas)
 //           400     → { message: string }  (campos inválidos)
 //
-//  Si el login es exitoso guarda el token (según "remember") y redirige al dashboard.
+//  Solo guarda el token. La redirección la maneja app.js para que
+//  en el futuro se pueda redirigir al usuario a donde estaba antes del login
+//  sin tocar esta función.
 
 async function loginUser(email, password, remember) {
-    const res  = await fetch(`${API_BASE}/auth/login`, {
+    const res  = await safeFetch(`${API_BASE}/auth/login`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ email, password, remember }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión.');
-    saveToken(data.token, remember);
-    window.location.href = '/dashboard'; // redirige al dashboard tras login exitoso
+    saveToken(data.token, remember); // guarda el token según la preferencia "Recuérdame"
 }
 
 
@@ -89,13 +162,13 @@ async function loginUser(email, password, remember) {
 //  POST /auth/forgot-password
 //
 //  Envía:   { email: string }
-//  Espera:  200 OK  → {} (vacío; el servidor ya mandó el correo con el OTP)
+//  Espera:  200 OK  → {} (vacío; el servidor envió el OTP al email)
 //           404     → { message: string }  (email no registrado)
 //
 //  No devuelve nada. Si falla, lanza un Error que app.js captura y muestra inline.
 
 async function sendResetEmail(email) {
-    const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+    const res = await safeFetch(`${API_BASE}/auth/forgot-password`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ email }),
@@ -115,11 +188,10 @@ async function sendResetEmail(email) {
 //  Espera:  200 OK  → { verified: true }
 //           400     → { verified: false, message: string }  (código incorrecto o expirado)
 //
-//  El backend verifica que el OTP coincida con el enviado al email
-//  y que no haya expirado (normalmente 10–15 min de validez).
+//  El backend verifica que el OTP coincida y no haya expirado (normalmente 10–15 min).
 
 async function verifyOtp(email, otp) {
-    const res  = await fetch(`${API_BASE}/auth/verify-otp`, {
+    const res  = await safeFetch(`${API_BASE}/auth/verify-otp`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ email, otp }),
@@ -140,7 +212,7 @@ async function verifyOtp(email, otp) {
 //  El backend invalida el OTP usado y actualiza la contraseña del usuario.
 
 async function resetPassword(email, password) {
-    const res = await fetch(`${API_BASE}/auth/reset-password`, {
+    const res = await safeFetch(`${API_BASE}/auth/reset-password`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ email, password }),
