@@ -1,84 +1,214 @@
-'use strict'; // activa modo estricto: detecta errores antes de que causen bugs
+'use strict';
 
-// Navegar a la pantalla de recuperación de contraseña al pulsar el enlace.
+// ══════════════════════════════════════════════════════════════════════════════
+//  app.js  –  Capa de control (Controller)
+//
+//  Responsabilidad: conecta la UI con la API.
+//  Solo contiene event listeners. Nunca manipula el DOM directamente
+//  (eso es trabajo de ui.js) ni llama a fetch directamente (eso es api.js).
+//
+//  Patrón de cada listener async:
+//    1. Leer valores del DOM
+//    2. Validación rápida del lado del cliente
+//    3. setLoading(btn, true)   ← deshabilita botón
+//    4. await función_de_api()
+//    5. Manejar éxito o mostrar error inline
+//    6. setLoading(btn, false)  ← en el bloque finally (siempre se ejecuta)
+// ══════════════════════════════════════════════════════════════════════════════
+
+
+// ── PANTALLA 1: LOGIN ─────────────────────────────────────────────────────────
+
+// Enlace "¿Olvidaste tu contraseña?" → navega a la pantalla de recuperación.
 document.getElementById('btn-forgot').addEventListener('click', e => {
-    e.preventDefault(); // evita que el enlace <a> navegue por defecto
-    showScreen('screen-forgot'); // muestra la pantalla de "olvidé mi contraseña"
+    e.preventDefault();          // evita que el <a> navegue por defecto
+    showScreen('screen-forgot'); // delega a ui.js
 });
 
-// Login: recoge los datos del formulario y llama al backend.
+// Botón "Iniciar sesión" → valida campos y llama al backend.
 document.getElementById('btn-login').addEventListener('click', async () => {
-    const email    = document.getElementById('login-email').value.trim(); // email sin espacios
-    const password = document.getElementById('login-password').value;     // contraseña tal cual
-    const remember = document.getElementById('remember-me').checked;      // true si el checkbox está marcado
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const remember = document.getElementById('remember-me').checked;
+    const btn      = document.getElementById('btn-login');
 
-    if (!email || !password) return alert('Por favor completa todos los campos.'); // valida que no estén vacíos
+    // Validación cliente: ambos campos requeridos
+    if (!email || !password) {
+        showError('error-login', 'Por favor completa todos los campos.');
+        return;
+    }
+
+    clearError('error-login'); // limpia error anterior si existía
+    setLoading(btn, true);     // deshabilita botón y muestra "Cargando…"
 
     try {
-        await loginUser(email, password, remember); // llama a la función en api.js
+        // api.js: POST /auth/login → guarda token → redirige a /dashboard
+        await loginUser(email, password, remember);
     } catch (err) {
-        alert(err.message); // muestra el error devuelto por el servidor
+        showError('error-login', err.message); // muestra el mensaje del servidor inline
+    } finally {
+        setLoading(btn, false); // siempre reactiva el botón, haya error o no
     }
 });
 
-// Recuperación: valida el email, llama al backend y abre la pantalla OTP.
+// Botones sociales: stubs para integración futura con OAuth (Google / Facebook).
+// Cuando el backend tenga los endpoints de OAuth, reemplazar el showError
+// por window.location.href = '/auth/google'  (o el flujo que corresponda).
+['btn-google', 'btn-facebook'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', () => {
+        showError('error-login', 'Login social próximamente disponible.');
+    });
+});
+
+// Enlace "Regístrate": stub hasta que la pantalla/página de registro esté lista.
+document.getElementById('btn-go-register')?.addEventListener('click', e => {
+    e.preventDefault();
+    showError('error-login', 'Registro próximamente disponible.');
+});
+
+
+// ── PANTALLA 2: RECUPERAR CONTRASEÑA ──────────────────────────────────────────
+
+// Botón "Reiniciar contraseña" → valida el email y solicita el código OTP.
 document.getElementById('btn-send-reset').addEventListener('click', async () => {
-    const email = document.getElementById('forgot-email').value.trim(); // email sin espacios
+    const emailInput = document.getElementById('forgot-email');
+    const email      = emailInput.value.trim();
+    const btn        = document.getElementById('btn-send-reset');
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))  // valida formato de email con regex
-        return document.getElementById('forgot-email').focus(); // pone el foco en el campo si es inválido
+    // Validación cliente: formato de email con regex simple
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('error-forgot', 'Ingresa un email válido.');
+        emailInput.focus();
+        return;
+    }
+
+    clearError('error-forgot');
+    setLoading(btn, true);
 
     try {
-        await sendResetEmail(email); // solicita el correo de recuperación al backend
-        document.getElementById('otp-email-display').textContent = email; // muestra el email en la pantalla OTP
-        openModal('modal-email'); // muestra el modal de confirmación de envío
+        // api.js: POST /auth/forgot-password
+        // El servidor envía un email con el código OTP de 6 dígitos al usuario.
+        await sendResetEmail(email);
+
+        // Guarda el email visible en la pantalla OTP (se reutiliza en verifyOtp y resetPassword)
+        document.getElementById('otp-email-display').textContent = email;
+        openModal('modal-email'); // modal de confirmación "revisa tu email"
+
         setTimeout(() => {
-            closeModal('modal-email');   // cierra el modal tras 2.5 segundos
-            showScreen('screen-otp');    // navega a la pantalla de verificación OTP
-            startOtpTimer(135);          // inicia el contador de 2 min 15 seg
-            otpBoxes[0]?.focus();        // pone el foco en la primera caja OTP
+            closeModal('modal-email');
+            showScreen('screen-otp'); // navega a verificación OTP
+            startOtpTimer(135);       // 2 min 15 seg de ventana para ingresar el código
+            otpBoxes[0]?.focus();     // foco en la primera caja OTP
         }, 2500);
+
     } catch (err) {
-        alert(err.message); // muestra el error devuelto por el servidor
+        showError('error-forgot', err.message);
+    } finally {
+        setLoading(btn, false);
     }
 });
 
-// OTP: recoge el código ingresado y lo verifica contra el backend.
+
+// ── PANTALLA 3: VERIFICACIÓN OTP ──────────────────────────────────────────────
+
+// Botón "Verificar" → recoge el código y lo valida contra el backend.
 document.getElementById('btn-verify-otp').addEventListener('click', async () => {
-    const otp   = getOtp(); // obtiene el código de 4 dígitos de las cajas OTP
-    const email = document.getElementById('otp-email-display').textContent; // recupera el email guardado
+    const otp   = getOtp(); // une las 6 cajas → "123456"
+    const email = document.getElementById('otp-email-display').textContent;
+    const btn   = document.getElementById('btn-verify-otp');
 
-    if (otp.length < 4) return alert('Ingresa el código completo de 4 dígitos.'); // valida que estén los 4 dígitos
+    // Validación cliente: los 6 dígitos deben estar completos
+    if (otp.length < 6) {
+        showError('error-otp', 'Ingresa el código completo de 6 dígitos.');
+        return;
+    }
+
+    clearError('error-otp');
+    setLoading(btn, true);
 
     try {
-        await verifyOtp(email, otp); // verifica el código contra el backend
-        showScreen('screen-newpass'); // si es válido, navega a la pantalla de nueva contraseña
+        // api.js: POST /auth/verify-otp { email, otp }
+        // El backend confirma que el código es correcto y no ha expirado.
+        await verifyOtp(email, otp);
+        showScreen('screen-newpass'); // si es válido, avanza a crear nueva contraseña
     } catch (err) {
-        alert(err.message); // muestra el error si el código es incorrecto
+        showError('error-otp', err.message);
+        // Limpia las cajas OTP para que el usuario lo intente de nuevo limpio
+        otpBoxes.forEach(b => b.value = '');
+        otpBoxes[0]?.focus();
+    } finally {
+        setLoading(btn, false);
     }
 });
 
-// Nueva contraseña: valida los campos y envía la contraseña al backend.
+// Botón "Reenviar código" → visible solo cuando el timer llega a 0 (lógica en ui.js).
+// Vuelve a llamar a sendResetEmail con el mismo email y reinicia el timer.
+document.getElementById('btn-resend-otp').addEventListener('click', async () => {
+    const email = document.getElementById('otp-email-display').textContent;
+    const btn   = document.getElementById('btn-resend-otp');
+
+    clearError('error-otp');
+    setLoading(btn, true);
+
+    try {
+        // Misma llamada que en pantalla 2: solicita un nuevo código al backend.
+        await sendResetEmail(email);
+        startOtpTimer(135);            // reinicia el contador (oculta el botón)
+        otpBoxes.forEach(b => b.value = ''); // limpia las cajas
+        otpBoxes[0]?.focus();
+    } catch (err) {
+        showError('error-otp', err.message);
+    } finally {
+        setLoading(btn, false);
+    }
+});
+
+
+// ── PANTALLA 4: NUEVA CONTRASEÑA ──────────────────────────────────────────────
+
+// Botón "Reiniciar contraseña" → valida las contraseñas y las envía al backend.
 document.getElementById('btn-reset-password').addEventListener('click', async () => {
-    if (newPassInput.value.length < 8) {        // verifica longitud mínima de 8 caracteres
-        alert('La contraseña debe tener al menos 8 caracteres.');
-        return newPassInput.focus();             // pone el foco en el campo si falla
-    }
-    if (!checkMatch()) return confirmPassInput.focus(); // verifica que ambas contraseñas coincidan
+    const btn   = document.getElementById('btn-reset-password');
+    const email = document.getElementById('otp-email-display').textContent;
 
-    const email = document.getElementById('otp-email-display').textContent; // recupera el email del flujo anterior
+    // Validación cliente: mínimo 8 caracteres
+    if (newPassInput.value.length < 8) {
+        showError('error-newpass', 'La contraseña debe tener al menos 8 caracteres.');
+        newPassInput.focus();
+        return;
+    }
+
+    // Validación cliente: las dos contraseñas deben coincidir
+    if (!checkMatch()) {
+        showError('error-newpass', 'Las contraseñas no coinciden.');
+        confirmPassInput.focus();
+        return;
+    }
+
+    clearError('error-newpass');
+    setLoading(btn, true);
 
     try {
-        await resetPassword(email, newPassInput.value); // envía la nueva contraseña al backend
-        openModal('modal-success'); // muestra el modal de éxito si todo salió bien
+        // api.js: POST /auth/reset-password { email, password }
+        // El backend actualiza la contraseña e invalida el OTP usado.
+        await resetPassword(email, newPassInput.value);
+        openModal('modal-success'); // modal de éxito
     } catch (err) {
-        alert(err.message); // muestra el error devuelto por el servidor
+        showError('error-newpass', err.message);
+    } finally {
+        setLoading(btn, false);
     }
 });
 
-// Modal de éxito: limpia el formulario OTP y regresa al login.
+
+// ── MODAL DE ÉXITO ────────────────────────────────────────────────────────────
+
+// Botón "Entendido" → limpia todo el flujo de recuperación y vuelve al login.
 document.getElementById('btn-modal-done').addEventListener('click', () => {
-    closeModal('modal-success');              // cierra el modal de éxito
-    otpBoxes.forEach(b => b.value = '');     // borra los 4 dígitos OTP ingresados
-    showScreen('screen-login');              // vuelve a la pantalla principal de login
+    closeModal('modal-success');
+    otpBoxes.forEach(b => b.value = '');    // limpia las cajas OTP
+    newPassInput.value     = '';             // limpia los campos de contraseña
+    confirmPassInput.value = '';
+    matchMsg.textContent   = '';             // limpia el mensaje de validación
+    showScreen('screen-login');              // vuelve a la pantalla inicial
 });

@@ -648,3 +648,51 @@ body {
 .modal-box .btn-primary {
     max-width: 200px;
 }
+
+/* ── INLINE ERROR MESSAGE ── */
+/* Reemplaza los alert(). Aparece debajo del botón de cada pantalla.  */
+/* hidden por defecto; ui.js lo muestra con showError() cuando ocurre un error. */
+.field-error {
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 8px;
+    text-align: center;
+    min-height: 16px;
+    animation: fadeIn 0.2s ease; /* igual que el resto de animaciones del proyecto */
+}
+
+/* ── RESEND OTP BUTTON ── */
+/* Botón de texto plano que aparece cuando el timer llega a 0 (ver ui.js). */
+.btn-resend {
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    margin-top: 8px;
+    text-align: center;
+    transition: color var(--transition);
+}
+
+.btn-resend:hover {
+    color: var(--blue-hover);
+}
+
+.btn-resend:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── OTP boxes: ajuste para 6 dígitos (cajas más pequeñas) ── */
+@media (max-width: 420px) {
+    .otp-box {
+        width: 44px;
+        height: 52px;
+        font-size: 20px;
+    }
+}

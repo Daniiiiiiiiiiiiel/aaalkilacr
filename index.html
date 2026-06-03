@@ -88,6 +88,7 @@
                 </div>
 
                 <button class="btn-primary" id="btn-login">Iniciar Sesión</button>
+                <p class="field-error" id="error-login" hidden></p>
 
                 <div class="divider"><span>o inicia sesión con una cuenta:</span></div>
 
@@ -138,6 +139,7 @@
                 </div>
 
                 <button class="btn-primary" id="btn-send-reset">Reiniciar contraseña</button>
+                <p class="field-error" id="error-forgot" hidden></p>
             </div>
 
 
@@ -162,14 +164,19 @@
                     <input class="otp-box" type="text" maxlength="1" inputmode="numeric" />
                     <input class="otp-box" type="text" maxlength="1" inputmode="numeric" />
                     <input class="otp-box" type="text" maxlength="1" inputmode="numeric" />
+                    <input class="otp-box" type="text" maxlength="1" inputmode="numeric" />
+                    <input class="otp-box" type="text" maxlength="1" inputmode="numeric" />
                 </div>
 
                 <button class="btn-primary" id="btn-verify-otp">Verificar</button>
+                <p class="field-error" id="error-otp" hidden></p>
 
                 <div class="resend-row">
                     <span>Reenviaremos otro código en</span>
                     <span class="timer" id="otp-timer">02:15</span>
                 </div>
+
+                <button class="btn-resend" id="btn-resend-otp" hidden>Reenviar código</button>
 
                 <p class="spam-note">No recibiste el email? Revisa tu spam</p>
             </div>
@@ -224,6 +231,7 @@
                 </div>
 
                 <button class="btn-primary" id="btn-reset-password">Reiniciar contraseña</button>
+                <p class="field-error" id="error-newpass" hidden></p>
             </div>
 
         </main><!-- /panel-right -->
