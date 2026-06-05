@@ -9,7 +9,7 @@
 //  Cambiar API_BASE por la URL real del backend antes de desplegar.
 // ══════════════════════════════════════════════════════════════════════════════
 
-const API_BASE = 'https://api.alkila.cr/v1'; // ← URL base del backend
+const API_BASE = 'http://192.168.18.232:8000/v1'; // ← URL base del backend
 
 
 // ── TOKEN ─────────────────────────────────────────────────────────────────────
@@ -21,21 +21,26 @@ const API_BASE = 'https://api.alkila.cr/v1'; // ← URL base del backend
 //  getToken()   → lo busca en ambos almacenes.
 //  clearToken() → lo elimina de ambos (usar en logout).
 
-function saveToken(token, remember) {
-    if (remember) {
-        localStorage.setItem('token', token);   // sesión persistente
-    } else {
-        sessionStorage.setItem('token', token); // sesión temporal
+function saveToken(accessToken, remember, refreshToken = null) {
+    sessionStorage.setItem('token', accessToken); // El token normal siempre va en sessionStorage
+    if (remember && refreshToken) {
+        localStorage.setItem('refresh_token', refreshToken); // El refresh token va en localStorage si se activa "Recuérdame"
+    } else if (!remember) {
+        localStorage.removeItem('refresh_token'); // Limpiamos en caso contrario
     }
 }
 
 function getToken() {
-    return localStorage.getItem('token') || sessionStorage.getItem('token') || null;
+    return sessionStorage.getItem('token') || null;
+}
+
+function getRefreshToken() {
+    return localStorage.getItem('refresh_token') || null;
 }
 
 function clearToken() {
-    localStorage.removeItem('token');
     sessionStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
 }
 
 
@@ -69,25 +74,30 @@ async function safeFetch(url, options = {}) {
 //  Si el refresh falla, borra el token viejo y redirige al login.
 
 async function tryRefreshToken() {
-    const token = getToken();
-    if (!token) return false; // no hay token que refrescar
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) return false; // no hay token de actualización
 
     try {
-        const res = await fetch(`${API_BASE}/auth/refresh-token`, {
-            method:  'POST',
+        const res = await fetch(`${API_BASE}/auth/refresh_token`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ token }),
+            body: JSON.stringify({ refresh_token: refreshToken }), // Se envía el refresh token en el parámetro "token"
         });
-        if (!res.ok) return false; // el servidor rechazó el refresh
+        if (!res.ok) {
+            clearToken(); // El refresh token también expiró o es inválido en la DB → limpiamos
+            return false;
+        }
 
-        const data    = await res.json();
-        const remember = !!localStorage.getItem('token'); // mantiene la preferencia original
-        saveToken(data.token, remember);
+        const data = await res.json();
+
+        // Guardamos los nuevos tokens manteniendo la persistencia
+        saveToken(data.token, true, data.refresh_token || refreshToken);
         return true; // token renovado exitosamente
     } catch {
         return false; // error de red durante el refresh
     }
 }
+
 
 
 // ── authFetch ─────────────────────────────────────────────────────────────────
@@ -107,7 +117,7 @@ async function tryRefreshToken() {
 
 async function authFetch(endpoint, options = {}, _retry = false) {
     const token = getToken();
-    const res   = await safeFetch(`${API_BASE}${endpoint}`, {
+    const res = await safeFetch(`${API_BASE}${endpoint}`, {
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -146,14 +156,14 @@ async function authFetch(endpoint, options = {}, _retry = false) {
 //  sin tocar esta función.
 
 async function loginUser(email, password, remember) {
-    const res  = await safeFetch(`${API_BASE}/auth/login`, {
-        method:  'POST',
+    const res = await safeFetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email, password, remember }),
+        body: JSON.stringify({ email, password, remember }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión.');
-    saveToken(data.token, remember); // guarda el token según la preferencia "Recuérdame"
+    if (!res.ok) throw new Error(data.detail || 'Error al iniciar sesión.');
+    saveToken(data.token, remember, data.refresh_token); // guarda el token normal y el refresh token
 }
 
 
@@ -168,14 +178,14 @@ async function loginUser(email, password, remember) {
 //  No devuelve nada. Si falla, lanza un Error que app.js captura y muestra inline.
 
 async function sendResetEmail(email) {
-    const res = await safeFetch(`${API_BASE}/auth/forgot-password`, {
-        method:  'POST',
+    const res = await safeFetch(`${API_BASE}/auth/send_otp`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email }),
+        body: JSON.stringify({ email }),
     });
     if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || 'No se pudo enviar el correo.');
+        throw new Error(data.detail || 'No se pudo enviar el correo.');
     }
 }
 
@@ -191,13 +201,22 @@ async function sendResetEmail(email) {
 //  El backend verifica que el OTP coincida y no haya expirado (normalmente 10–15 min).
 
 async function verifyOtp(email, otp) {
-    const res  = await safeFetch(`${API_BASE}/auth/verify-otp`, {
-        method:  'POST',
+    const res = await safeFetch(`${API_BASE}/auth/verify_otp`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email, otp }),
+        body: JSON.stringify({
+            email,
+            token: otp,          // El backend espera "token" en vez de "otp"
+            type: 'recovery'     // Flujo de recuperación de contraseña
+        }),
     });
     const data = await res.json();
-    if (!res.ok || !data.verified) throw new Error(data.message || 'Código incorrecto. Intenta de nuevo.');
+    if (!res.ok) throw new Error(data.detail || 'Código incorrecto. Intenta de nuevo.');
+
+    // Guarda los tokens de recuperación directamente en el almacenamiento:
+    //   - Access token → sessionStorage (temporal, se borra al cerrar la pestaña)
+    //   - Refresh token → localStorage  (persiste para el flujo de reseteo)
+    saveToken(data.token, true, data.refresh_token);
 }
 
 
@@ -211,14 +230,74 @@ async function verifyOtp(email, otp) {
 //
 //  El backend invalida el OTP usado y actualiza la contraseña del usuario.
 
-async function resetPassword(email, password) {
-    const res = await safeFetch(`${API_BASE}/auth/reset-password`, {
-        method:  'POST',
+async function resetPassword(token, refreshToken, newPassword) {
+    const res = await safeFetch(`${API_BASE}/auth/reset_password`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email, password }),
+        body: JSON.stringify({
+            token: token,
+            refresh_token: refreshToken,
+            new_password: newPassword
+        }),
     });
     if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || 'Error al restablecer la contraseña.');
+        throw new Error(data.detail || 'Error al restablecer la contraseña.');
     }
+}
+
+
+// ── verifyFace ────────────────────────────────────────────────────────────────
+//
+//  POST /auth/rekognition
+//
+//  Envía:   { SourceImage64x: string, TargetImage64x: string, SimilarityThreshold: float }
+//  Espera:  200 OK  → { similarity: float }
+//           400     → { detail: string }
+//
+//  Compara una imagen origen (ej: documento) con una destino (ej: selfie) en Base64.
+
+async function verifyFace(sourceBase64, targetBase64) {
+    const res = await safeFetch(`${API_BASE}/auth/rekognition`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            SourceImage64x: sourceBase64,
+            TargetImage64x: targetBase64
+        })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        throw new Error(data.detail || 'No se pudo realizar la comparación facial.');
+    }
+    if (!data.match) {
+        throw new Error(data.detail || 'No coinciden las imagenes de su rostro');
+    }
+    return data.match; // true = pasó, false = no pasó
+}
+
+
+// ── validateImageFile ─────────────────────────────────────────────────────────────────────
+//
+//  Verifica que el archivo:
+//    1. Sea un formato de imagen permitido: JPG, PNG, WEBP o GIF
+//    2. No supere el límite máximo de tamaño (por defecto 4 MB)
+//
+//  Lanza un error descriptivo si alguna de las dos condiciones falla.
+
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+function validateImageFile(file, maxMb = 4) {
+    // 1. Validar tipo de archivo
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        throw new Error('Formato no permitido. Solo se aceptan imágenes JPG, PNG, WEBP o GIF.');
+    }
+
+    // 2. Validar tamaño
+    const maxBytes = maxMb * 1024 * 1024;
+    if (file.size > maxBytes) {
+        throw new Error(`El archivo supera el límite permitido de ${maxMb} MB (Tamaño actual: ${(file.size / (1024 * 1024)).toFixed(2)} MB).`);
+    }
+
+    return true;
 }

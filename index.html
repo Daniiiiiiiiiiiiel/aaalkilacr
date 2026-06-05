@@ -234,6 +234,59 @@
                 <p class="field-error" id="error-newpass" hidden></p>
             </div>
 
+
+            <!-- ════════════════════════════════════════════
+                 SCREEN 5 – REGISTRO (Verificación Facial)
+            ════════════════════════════════════════════ -->
+            <div class="screen" id="screen-register">
+                <button class="back-btn" data-target="screen-login" aria-label="Volver">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+
+                <h1 class="screen-title">Verificación de identidad</h1>
+                <p class="screen-subtitle">Sube una foto de tu cara y una foto de tu cédula para continuar.</p>
+
+                <div class="form-group">
+                    <label class="field-label">Foto de tu cara (selfie)</label>
+                    <label for="register-selfie" class="file-upload-card" id="card-selfie">
+                        <button type="button" class="btn-remove-image" aria-label="Eliminar imagen" style="display: none;">&times;</button>
+                        <div class="upload-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <span class="upload-text">Seleccionar foto de tu cara</span>
+                        <span class="file-name">Ningún archivo seleccionado</span>
+                        <img src="" class="image-preview" alt="Vista previa selfie" hidden />
+                    </label>
+                    <input type="file" id="register-selfie" accept="image/jpeg,image/png,image/webp,image/gif" style="display: none;" />
+                    <p class="hint-text">JPG, PNG, WEBP o GIF · Máximo 4 MB</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="field-label">Foto de tu cédula</label>
+                    <label for="register-cedula" class="file-upload-card" id="card-cedula">
+                        <button type="button" class="btn-remove-image" aria-label="Eliminar imagen" style="display: none;">&times;</button>
+                        <div class="upload-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                        </div>
+                        <span class="upload-text">Seleccionar foto de tu cédula</span>
+                        <span class="file-name">Ningún archivo seleccionado</span>
+                        <img src="" class="image-preview" alt="Vista previa cédula" hidden />
+                    </label>
+                    <input type="file" id="register-cedula" accept="image/jpeg,image/png,image/webp,image/gif" style="display: none;" />
+                    <p class="hint-text">JPG, PNG, WEBP o GIF · Máximo 4 MB</p>
+                </div>
+
+                <button class="btn-primary" id="btn-register-submit">Enviar verificación</button>
+                <p class="field-error" id="error-register" hidden></p>
+            </div>
+
         </main><!-- /panel-right -->
     </div><!-- /page-layout -->
 

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AALkilaCR</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+    <!-- ── HEADER ── -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            <img src="../assets/logo_2.png" alt="AALkilaCR" class="logo-img" />
+            <div class="header-divider"></div>
+            <div class="header-greeting">¡Hola! Alex, bienvenido.</div>
+        </div>
+        <div class="header-right">
+            <button class="btn-publish">Publicar Propiedad</button>
+            <button class="notification-bell" aria-label="Notificaciones">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span class="bell-badge"></span>
+            </button>
+            <div class="user-profile">
+                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80" alt="Avatar" class="avatar-img" />
+            </div>
+        </div>
+    </header>
+
+    <!-- ── LAYOUT WRAPPER ── -->
+    <div class="dashboard-layout">
+        <!-- ── SIDEBAR ── -->
+        <aside class="dashboard-sidebar">
+            <nav>
+                <ul class="sidebar-menu">
+                    <li class="menu-item active">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                            </svg>
+                            Inicio
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            Buscar
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            Chat
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            Favoritos
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Mi Perfil
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout-sidebar" id="btn-logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- ── MAIN CONTENT ── -->
+        <main class="dashboard-main">
+            <h1 class="main-headline">Encuentra tu próximo hogar. fácil y tico!</h1>
+
+            <div class="content-container">
+                <!-- Buscador / Card -->
+                <div class="search-section">
+                    <!-- Tabs -->
+                    <div class="tab-group">
+                        <button class="tab-btn active">Alquiler</button>
+                        <button class="tab-btn">Venta</button>
+                    </div>
+
+                    <!-- Search Fields Bar -->
+                    <div class="search-bar">
+                        <!-- Propiedad -->
+                        <div class="search-field select-field">
+                            <span class="field-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                            </span>
+                            <select class="search-select">
+                                <option>Apartamento</option>
+                                <option>Casa</option>
+                                <option>Estudio</option>
+                            </select>
+                        </div>
+
+                        <!-- Ubicación -->
+                        <div class="search-field select-field">
+                            <span class="field-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </span>
+                            <select class="search-select">
+                                <option>Ubicación</option>
+                                <option>San José</option>
+                                <option>Desamparados</option>
+                                <option>Gravilias</option>
+                            </select>
+                        </div>
+
+                        <!-- Min Price -->
+                        <div class="search-field no-arrow">
+                            <span class="field-icon" style="font-weight: 800; font-size: 16px;">₡</span>
+                            <input type="text" class="price-input" placeholder="Mín" />
+                        </div>
+
+                        <!-- Max Price -->
+                        <div class="search-field no-arrow">
+                            <span class="field-icon" style="font-weight: 800; font-size: 16px;">₡</span>
+                            <input type="text" class="price-input" placeholder="Máx" />
+                        </div>
+
+                        <!-- Search Button -->
+                        <button class="btn-search">Buscar</button>
+
+                        <!-- Filter Detail Button -->
+                        <button class="btn-filter-icon" aria-label="Filtros avanzados">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sorting row desktop -->
+                <div class="sorting-row">
+                    <span class="sorting-label">Ordenar por:</span>
+                    <div class="sorting-select-wrapper">
+                        <select class="sorting-select">
+                            <option>Menor Precio</option>
+                            <option>Mayor Precio</option>
+                            <option>Recientes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Mobile Filters & Sorting Row -->
+                <div class="mobile-filters-row">
+                    <div class="mobile-sorting-wrapper">
+                        <select>
+                            <option>Menor Precio</option>
+                            <option>Mayor Precio</option>
+                            <option>Recientes</option>
+                        </select>
+                    </div>
+                    <button class="mobile-btn-filter">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                        Filtros
+                    </button>
+                </div>
+
+                <!-- Properties Grid/Carousel -->
+                <div class="properties-carousel-wrapper">
+                    <div class="properties-grid">
+                        <!-- Card 1 -->
+                        <div class="property-card">
+                            <div class="card-img-wrapper">
+                                <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80" alt="Apartamento Gravilias" class="card-img" />
+                            </div>
+                            <div class="card-content">
+                                <div class="card-header-row">
+                                    <h2 class="card-title">Moderno Apartamento en Gravilias</h2>
+                                    <span class="price-badge">₡275,000</span>
+                                </div>
+                                <div class="card-location">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Gravilias, Desamparados
+                                </div>
+                                <div class="card-specs">
+                                    <span class="spec-item" title="Dormitorios">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10V19M21 10V19M3 14H21M3 10C3 7 6 7 12 7S21 7 21 10M5 7V10M19 7V10" />
+                                        </svg>
+                                        3
+                                    </span>
+                                    <span class="spec-item" title="Baños">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M6 10v10a1 1 0 001 1h10a1 1 0 001-1V10M10 6a2 2 0 114 0v4H10V6z" />
+                                        </svg>
+                                        1
+                                    </span>
+                                    <span class="spec-item" title="Parqueos">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10V8a3 3 0 013-3h8a3 3 0 013 3v2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0H5m4 4h.01M15 14h.01" />
+                                        </svg>
+                                        1
+                                    </span>
+                                    <span class="spec-item" title="Área">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V16M4 16H12M4 12H8M12 12V16M16 12V16M20 8V16M20 16H12M20 12H16" />
+                                        </svg>
+                                        49M
+                                    </span>
+                                    <span class="spec-item" title="Personas">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        5
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="property-card">
+                            <div class="card-img-wrapper">
+                                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80" alt="Apartamento Torre" class="card-img" />
+                            </div>
+                            <div class="card-content">
+                                <div class="card-header-row">
+                                    <h2 class="card-title">Amplio Apartamento en Torre</h2>
+                                    <span class="price-badge">₡325,000</span>
+                                </div>
+                                <div class="card-location">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    San José
+                                </div>
+                                <div class="card-specs">
+                                    <span class="spec-item" title="Dormitorios">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10V19M21 10V19M3 14H21M3 10C3 7 6 7 12 7S21 7 21 10M5 7V10M19 7V10" />
+                                        </svg>
+                                        2
+                                    </span>
+                                    <span class="spec-item" title="Baños">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M6 10v10a1 1 0 001 1h10a1 1 0 001-1V10M10 6a2 2 0 114 0v4H10V6z" />
+                                        </svg>
+                                        1
+                                    </span>
+                                    <span class="spec-item" title="Parqueos">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10V8a3 3 0 013-3h8a3 3 0 013 3v2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0H5m4 4h.01M15 14h.01" />
+                                        </svg>
+                                        1
+                                    </span>
+                                    <span class="spec-item" title="Área">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V16M4 16H12M4 12H8M12 12V16M16 12V16M20 8V16M20 16H12M20 12H16" />
+                                        </svg>
+                                        48M
+                                    </span>
+                                    <span class="spec-item" title="Personas">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        5
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="property-card">
+                            <div class="card-img-wrapper">
+                                <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80" alt="Apto céntrico Desamparados" class="card-img" />
+                            </div>
+                            <div class="card-content">
+                                <div class="card-header-row">
+                                    <h2 class="card-title">Apto céntrico en Desamparados</h2>
+                                    <span class="price-badge">₡245,000</span>
+                                </div>
+                                <div class="card-location">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Desamparados
+                                </div>
+                                <div class="card-specs">
+                                    <span class="spec-item" title="Dormitorios">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10V19M21 10V19M3 14H21M3 10C3 7 6 7 12 7S21 7 21 10M5 7V10M19 7V10" />
+                                        </svg>
+                                        2
+                                    </span>
+                                    <span class="spec-item" title="Baños">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M6 10v10a1 1 0 001 1h10a1 1 0 001-1V10M10 6a2 2 0 114 0v4H10V6z" />
+                                        </svg>
+                                        1
+                                    </span>
+                                    <span class="spec-item" title="Parqueos">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10V8a3 3 0 013-3h8a3 3 0 013 3v2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0H5m4 4h.01M15 14h.01" />
+                                        </svg>
+                                        1
+                                    </span>
+                                    <span class="spec-item" title="Área">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V16M4 16H12M4 12H8M12 12V16M16 12V16M20 8V16M20 16H12M20 12H16" />
+                                        </svg>
+                                        45M
+                                    </span>
+                                    <span class="spec-item" title="Personas">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        5
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Next Button Carousel -->
+                    <button class="carousel-btn-next" aria-label="Siguiente propiedad">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/api.js"></script>
+    <script>
+        // Proteger ruta
+        if (!getToken()) {
+            window.location.href = '../';
+        }
+
+        // Cerrar sesión
+        document.getElementById('btn-logout').addEventListener('click', (e) => {
+            e.preventDefault();
+            clearToken();
+            window.location.href = '../index.html';
+        });
+
+        // Tab selection animation
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>
