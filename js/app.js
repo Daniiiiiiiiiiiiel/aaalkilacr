@@ -281,19 +281,33 @@ document.getElementById('btn-modal-done').addEventListener('click', () => {
 });
 
 
+// Variables globales para almacenar las credenciales de identificación validadas
+// temporalmente antes de la creación final de la cuenta del Arrendador.
+let validatedArrendadorIdType = '';
+let validatedArrendadorIdNumber = '';
+
 // Función para limpiar los campos y previsualizaciones del registro
 function clearRegistrationInputs() {
+    // Limpia el selector y campo de número de identificación
+    const selectEl = document.getElementById('register-id-type');
+    const inputEl = document.getElementById('register-id-number');
+    if (selectEl) {
+        selectEl.value = 'CEDULA';
+        selectEl.dispatchEvent(new Event('change'));
+    }
+    if (inputEl) inputEl.value = '';
+
     const selfieInput = document.getElementById('register-selfie');
     const cedulaInput = document.getElementById('register-cedula');
     if (selfieInput) selfieInput.value = '';
     if (cedulaInput) cedulaInput.value = '';
 
-    document.querySelectorAll('.file-upload-card').forEach(card => {
+    document.querySelectorAll('#screen-register .file-upload-card').forEach(card => {
         card.classList.remove('has-preview');
         const fileNameEl = card.querySelector('.file-name');
         const previewImg = card.querySelector('.image-preview');
         const btnRemove = card.querySelector('.btn-remove-image');
-        if (fileNameEl) fileNameEl.textContent = 'Ningún archivo seleccionado';
+        if (fileNameEl) fileNameEl.textContent = 'Ninguno';
         if (previewImg) {
             previewImg.src = '';
             previewImg.hidden = true;
@@ -305,16 +319,40 @@ function clearRegistrationInputs() {
     clearError('error-register');
 }
 
-// "Regístrate" → navega a la pantalla de registro.
+// "Regístrate" → navega a la pantalla de selección de tipo de cuenta.
+// No va directamente al registro: primero el usuario elige si es
+// Arrendatario o Arrendador, y desde ahí se bifurca.
 document.getElementById('btn-go-register').addEventListener('click', e => {
     e.preventDefault();
     clearRegistrationInputs();
+    showScreen('screen-tipo-cuenta');
+});
+
+// ── PANTALLA 5: SELECCIÓN DE TIPO DE CUENTA ─────────────────────────────────
+//
+//  Dos tarjetas: Arrendatario y Arrendador.
+//  Según la elección se navega al flujo correspondiente.
+
+// Opción Arrendatario → flujo simple sin verificación biométrica
+document.getElementById('btn-tipo-arrendatario').addEventListener('click', () => {
+    clearArrendatarioInputs(); // Limpia el formulario antes de entrar
+    showScreen('screen-arrendatario');
+});
+
+// Opción Arrendador → flujo completo con verificación facial
+document.getElementById('btn-tipo-arrendador').addEventListener('click', () => {
+    clearRegistrationInputs(); // Limpia el formulario de arrendador antes de entrar
     showScreen('screen-register');
 });
 
-// Limpiar inputs al hacer clic en el botón de retroceso de la pantalla de registro
+// Limpiar inputs al retroceder desde la pantalla de arrendador (vuelve a tipo-cuenta)
 document.querySelector('#screen-register .back-btn').addEventListener('click', () => {
     clearRegistrationInputs();
+});
+
+// Limpiar inputs al retroceder desde la pantalla de arrendatario (vuelve a tipo-cuenta)
+document.querySelector('#screen-arrendatario .back-btn').addEventListener('click', () => {
+    clearArrendatarioInputs();
 });
 
 // Función auxiliar: lee un archivo de imagen y devuelve Base64 puro (sin prefijos ni etiquetas)
@@ -334,19 +372,31 @@ function fileToBase64(file) {
     });
 }
 
-// Botón "Enviar verificación" → valida archivos, los convierte a Base64 y llama a verifyFace.
+// Botón "Enviar verificación" → valida archivos e identificación, llama a verifyFace y luego
+// a verifyRegistroOficial. Solo si ambas pasan, avanza a la pantalla de credenciales.
 document.getElementById('btn-register-submit').addEventListener('click', async () => {
     const btn = document.getElementById('btn-register-submit');
     const selfie = document.getElementById('register-selfie').files[0];
     const cedula = document.getElementById('register-cedula').files[0];
 
-    // Validación: ambas imágenes deben estar seleccionadas
+    // Leer el tipo y número de identificación digitado por el usuario
+    const idType = document.getElementById('register-id-type').value;
+    const idNumber = document.getElementById('register-id-number').value.trim();
+
+    // Validación 1: el número de identificación no puede estar vacío
+    if (!idNumber) {
+        showError('error-register', 'Debes ingresar tu número de identificación.');
+        document.getElementById('register-id-number').focus();
+        return;
+    }
+
+    // Validación 2: ambas imágenes deben estar seleccionadas
     if (!selfie || !cedula) {
         showError('error-register', 'Debes subir ambas imágenes para continuar.');
         return;
     }
 
-    // Validación: tipo y tamaño de cada archivo (máximo 4 MB, solo imágenes)
+    // Validación 3: tipo y tamaño de cada archivo (máximo 4 MB, solo imágenes)
     try {
         validateImageFile(selfie);
         validateImageFile(cedula);
@@ -359,22 +409,242 @@ document.getElementById('btn-register-submit').addEventListener('click', async (
     setLoading(btn, true);
 
     try {
-        // Convierte ambas imágenes a Base64 puro (sin encabezado DataURL)
+        // Paso 1: convertir ambas imágenes a Base64 puro (sin encabezado DataURL)
         const selfieBase64 = await fileToBase64(selfie);
         const cedulaBase64 = await fileToBase64(cedula);
 
-        // api.js: POST /auth/rekognition { SourceImage64x, TargetImage64x }
-        // El selfie es la imagen fuente (cara real) y la cédula es el objetivo a comparar.
-        const similarity = await verifyFace(selfieBase64, cedulaBase64);
+        // Paso 2: api.js → verifyFace
+        //   - Compara las dos fotografías (match)
+        //   - Verifica que el número de identificación coincida con el detectado (cedula_match)
+        //   Lanza Error si alguna de las dos condiciones falla.
+        await verifyFace(selfieBase64, cedulaBase64, idNumber);
 
-        // El backend puede retornar true, un float o incluso undefined — manejamos todos los casos.
-        // Si llegamos aquí sin excepción, la verificación fue exitosa.
+        // Paso 3: api.js → verifyRegistroOficial
+        //   Consulta en un endpoint SEPARADO si la persona está en el padrón oficial.
+        //   Solo se ejecuta si el Paso 2 fue exitoso.
+        await verifyRegistroOficial(idNumber, idType);
 
-        clearRegistrationInputs();
-        showScreen('screen-login');
+        // Guardamos los datos de identificación validados para el registro final
+        validatedArrendadorIdType = idType;
+        validatedArrendadorIdNumber = idNumber;
+
+        // Ambas validaciones pasaron → avanzar a la pantalla de credenciales
+        showScreen('screen-credentials');
+
     } catch (err) {
+        // Cualquier error de cualquiera de los dos pasos se muestra aquí
         showError('error-register', err.message);
 
+    } finally {
+        setLoading(btn, false);
+    }
+});
+
+
+// ── PANTALLA 5b: FLUJO ARRENDATARIO ──────────────────────────────────────────
+//
+//  Registro simple sin verificación biométrica. El flujo es:
+//    1. Validación de campos en el cliente.
+//    2. Registro en el backend (registerArrendatario).
+//    3. Validación de cédula en el registro oficial (verifyRegistroOficial).
+//    4. Si ambos pasos son exitosos, se muestra el modal de éxito y vuelve al login.
+
+// Referencias a los elementos del formulario de Arrendatario
+const arrPassInput = document.getElementById('arr-password');
+const arrConfirmPassInput = document.getElementById('arr-confirm-password');
+const arrMatchMsg = document.getElementById('arr-match-msg');
+
+// Limpia todos los campos del formulario de Arrendatario
+function clearArrendatarioInputs() {
+    ['arr-username', 'arr-email', 'arr-id-number'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    const typeSelect = document.getElementById('arr-id-type');
+    if (typeSelect) {
+        typeSelect.value = 'CEDULA';
+        typeSelect.dispatchEvent(new Event('change'));
+    }
+    if (arrPassInput) arrPassInput.value = '';
+    if (arrConfirmPassInput) arrConfirmPassInput.value = '';
+    if (arrMatchMsg) arrMatchMsg.textContent = '';
+    clearError('error-arrendatario');
+}
+
+// Validación en tiempo real de coincidencia de contraseñas del formulario Arrendatario
+function checkArrPasswordMatch() {
+    if (!arrConfirmPassInput || !arrConfirmPassInput.value) {
+        if (arrMatchMsg) arrMatchMsg.textContent = '';
+        return false;
+    }
+    const match = arrPassInput.value === arrConfirmPassInput.value;
+    arrMatchMsg.textContent = match ? 'Las contraseñas coinciden ✓' : 'Las contraseñas no coinciden';
+    arrMatchMsg.style.color = match ? 'var(--success, #22c55e)' : 'var(--danger, #ef4444)';
+    return match;
+}
+
+if (arrPassInput) arrPassInput.addEventListener('input', checkArrPasswordMatch);
+if (arrConfirmPassInput) arrConfirmPassInput.addEventListener('input', checkArrPasswordMatch);
+
+// Botón "Crear cuenta" del flujo Arrendatario
+document.getElementById('btn-arrendatario-submit').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-arrendatario-submit');
+    const username = document.getElementById('arr-username').value.trim();
+    const email    = document.getElementById('arr-email').value.trim();
+    const idType   = document.getElementById('arr-id-type').value;
+    const idNumber = document.getElementById('arr-id-number').value.trim();
+    const password = arrPassInput ? arrPassInput.value : '';
+
+    // Validaciones del cliente (early return si hay error, sin llamadas al servidor)
+    if (!username) {
+        showError('error-arrendatario', 'El nombre de usuario es requerido.');
+        document.getElementById('arr-username').focus();
+        return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('error-arrendatario', 'Ingresá un email válido.');
+        document.getElementById('arr-email').focus();
+        return;
+    }
+    if (!idNumber) {
+        showError('error-arrendatario', 'El número de identificación es requerido.');
+        document.getElementById('arr-id-number').focus();
+        return;
+    }
+    if (password.length < 8) {
+        showError('error-arrendatario', 'La contraseña debe tener al menos 8 caracteres.');
+        arrPassInput.focus();
+        return;
+    }
+    if (!checkArrPasswordMatch()) {
+        showError('error-arrendatario', 'Las contraseñas no coinciden.');
+        arrConfirmPassInput.focus();
+        return;
+    }
+
+    clearError('error-arrendatario');
+    setLoading(btn, true);
+
+    try {
+        // Paso 1: api.js → registerArrendatario
+        //   Envía los datos al backend para crear la cuenta.
+        await registerArrendatario(username, email, password, idType, idNumber);
+
+        // Paso 2: api.js → verifyRegistroOficial
+        //   Valida que la identificación exista en el padrón oficial.
+        //   Solo se ejecuta si el Paso 1 fue exitoso.
+        await verifyRegistroOficial(idNumber, idType);
+
+        // Ambos pasos exitosos → limpiar y mostrar modal de éxito
+        clearArrendatarioInputs();
+        
+        // Ajustar el contenido del modal de éxito para el Registro
+        document.getElementById('modal-success-title').innerHTML = 'Cuenta creada<br>exitosamente!';
+        document.getElementById('modal-success-body').textContent = 'Ya puedes iniciar sesión con tus credenciales.';
+        openModal('modal-success');
+
+    } catch (err) {
+        showError('error-arrendatario', err.message);
+    } finally {
+        setLoading(btn, false);
+    }
+});
+
+
+// ── PANTALLA 6: CREDENCIALES DE REGISTRO (ARRENDADOR) ────────────────────────
+//
+//  Esta pantalla solo es accesible después de que verifyFace y
+//  verifyRegistroOficial retornen éxito. El usuario completa sus credenciales
+//  para crear la cuenta definitiva como Arrendador.
+
+// Validación en tiempo real de coincidencia de contraseñas en el formulario
+// de credenciales (reutiliza el mismo patrón que la pantalla de nueva contraseña)
+const regPassInput = document.getElementById('reg-password');
+const regConfirmPassInput = document.getElementById('reg-confirm-password');
+const regMatchMsg = document.getElementById('reg-match-msg');
+
+function checkRegPasswordMatch() {
+    if (!regConfirmPassInput.value) {
+        regMatchMsg.textContent = '';
+        return false;
+    }
+    const match = regPassInput.value === regConfirmPassInput.value;
+    regMatchMsg.textContent = match ? 'Las contraseñas coinciden ✓' : 'Las contraseñas no coinciden';
+    regMatchMsg.style.color = match ? 'var(--success, #22c55e)' : 'var(--danger, #ef4444)';
+    return match;
+}
+
+if (regPassInput) regPassInput.addEventListener('input', checkRegPasswordMatch);
+if (regConfirmPassInput) regConfirmPassInput.addEventListener('input', checkRegPasswordMatch);
+
+// Botón "Crear cuenta" → valida los campos y registra al usuario en el backend.
+document.getElementById('btn-credentials-submit').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-credentials-submit');
+    const username = document.getElementById('reg-username').value.trim();
+    const email    = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+
+    // Validaciones del lado del cliente antes de cualquier fetch
+    if (!username) {
+        showError('error-credentials', 'El nombre de usuario es requerido.');
+        document.getElementById('reg-username').focus();
+        return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('error-credentials', 'Ingresá un email válido.');
+        document.getElementById('reg-email').focus();
+        return;
+    }
+    if (password.length < 8) {
+        showError('error-credentials', 'La contraseña debe tener al menos 8 caracteres.');
+        regPassInput.focus();
+        return;
+    }
+    if (!checkRegPasswordMatch()) {
+        showError('error-credentials', 'Las contraseñas no coinciden.');
+        regConfirmPassInput.focus();
+        return;
+    }
+
+    // Asegurarse de que tenemos los datos de identificación validados por el flujo biométrico
+    if (!validatedArrendadorIdType || !validatedArrendadorIdNumber) {
+        showError('error-credentials', 'No se encontraron datos de identificación validados. Por favor, realiza la verificación facial de nuevo.');
+        return;
+    }
+
+    clearError('error-credentials');
+    setLoading(btn, true);
+
+    try {
+        // Enviar todos los datos de registro finales para el Arrendador
+        await registerArrendador(
+            username,
+            email,
+            password,
+            validatedArrendadorIdType,
+            validatedArrendadorIdNumber
+        );
+
+        // Registro exitoso, limpiar variables y campos
+        clearRegistrationInputs();
+        validatedArrendadorIdType = '';
+        validatedArrendadorIdNumber = '';
+
+        // Limpiar también los campos de credenciales
+        document.getElementById('reg-username').value = '';
+        document.getElementById('reg-email').value = '';
+        regPassInput.value = '';
+        regConfirmPassInput.value = '';
+        regMatchMsg.textContent = '';
+        clearError('error-credentials');
+
+        // Ajustar el contenido del modal de éxito para el Registro
+        document.getElementById('modal-success-title').innerHTML = 'Cuenta creada<br>exitosamente!';
+        document.getElementById('modal-success-body').textContent = 'Ya puedes iniciar sesión con tus credenciales.';
+        openModal('modal-success');
+
+    } catch (err) {
+        showError('error-credentials', err.message);
     } finally {
         setLoading(btn, false);
     }
@@ -438,3 +708,33 @@ function setupFilePreview(inputId, cardId) {
 // Inicializar previsualizaciones
 setupFilePreview('register-selfie', 'card-selfie');
 setupFilePreview('register-cedula', 'card-cedula');
+
+
+// ── FUNCIÓN DE PLACEHOLDERS DINÁMICOS DE IDENTIFICACIÓN ──────────────────────
+
+function setupDynamicPlaceholder(selectId, inputId) {
+    const selectEl = document.getElementById(selectId);
+    const inputEl = document.getElementById(inputId);
+    if (!selectEl || !inputEl) return;
+
+    const updatePlaceholder = () => {
+        const value = selectEl.value;
+        if (value === 'CEDULA') {
+            inputEl.placeholder = '1-1234-5678';
+        } else if (value === 'DIMEX') {
+            inputEl.placeholder = '123456789012';
+        } else if (value === 'PASAPORTE') {
+            inputEl.placeholder = 'AB1234567';
+        } else if (value === 'CEDULA_JURIDICA') {
+            inputEl.placeholder = '3-101-123456';
+        }
+    };
+
+    selectEl.addEventListener('change', updatePlaceholder);
+    // Inicializar el placeholder al cargar
+    updatePlaceholder();
+}
+
+// Configurar los placeholders dinámicos para ambos formularios
+setupDynamicPlaceholder('arr-id-type', 'arr-id-number');
+setupDynamicPlaceholder('register-id-type', 'register-id-number');

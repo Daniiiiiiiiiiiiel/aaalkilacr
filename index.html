@@ -236,9 +236,11 @@
 
 
             <!-- ════════════════════════════════════════════
-                 SCREEN 5 – REGISTRO (Verificación Facial)
+                 SCREEN 5 – SELECCIÓN DE TIPO DE CUENTA
+                 El usuario elige si es Arrendatario o Arrendador.
+                 Desde aquí se bifurca hacia el flujo correspondiente.
             ════════════════════════════════════════════ -->
-            <div class="screen" id="screen-register">
+            <div class="screen" id="screen-tipo-cuenta">
                 <button class="back-btn" data-target="screen-login" aria-label="Volver">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -246,45 +248,249 @@
                     </svg>
                 </button>
 
-                <h1 class="screen-title">Verificación de identidad</h1>
-                <p class="screen-subtitle">Sube una foto de tu cara y una foto de tu cédula para continuar.</p>
+                <h1 class="screen-title">Tipo de cuenta</h1>
+                <p class="screen-subtitle">Selecciona el tipo de cuenta que deseas crear para continuar.</p>
 
-                <div class="form-group">
-                    <label class="field-label">Foto de tu cara (selfie)</label>
-                    <label for="register-selfie" class="file-upload-card" id="card-selfie">
-                        <button type="button" class="btn-remove-image" aria-label="Eliminar imagen" style="display: none;">&times;</button>
-                        <div class="upload-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <!-- Tarjetas de selección de tipo de cuenta -->
+                <div class="tipo-cuenta-grid">
+
+                    <!-- Opción: Arrendatario -->
+                    <button class="tipo-cuenta-card" id="btn-tipo-arrendatario">
+                        <div class="tipo-cuenta-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                         </div>
-                        <span class="upload-text">Seleccionar foto de tu cara</span>
-                        <span class="file-name">Ningún archivo seleccionado</span>
-                        <img src="" class="image-preview" alt="Vista previa selfie" hidden />
-                    </label>
-                    <input type="file" id="register-selfie" accept="image/jpeg,image/png,image/webp,image/gif" style="display: none;" />
-                    <p class="hint-text">JPG, PNG, WEBP o GIF · Máximo 4 MB</p>
+                        <span class="tipo-cuenta-label">Arrendatario</span>
+                        <span class="tipo-cuenta-desc">Busco un lugar para vivir</span>
+                    </button>
+
+                    <!-- Opción: Arrendador -->
+                    <button class="tipo-cuenta-card" id="btn-tipo-arrendador">
+                        <div class="tipo-cuenta-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                        </div>
+                        <span class="tipo-cuenta-label">Arrendador</span>
+                        <span class="tipo-cuenta-desc">Publico propiedades en alquiler</span>
+                    </button>
+
+                </div>
+
+                <p class="field-error" id="error-tipo-cuenta" hidden></p>
+            </div>
+
+
+            <!-- ════════════════════════════════════════════
+                 SCREEN 5b – REGISTRO ARRENDATARIO
+                 Formulario simple sin validación biométrica.
+            ════════════════════════════════════════════ -->
+            <div class="screen" id="screen-arrendatario">
+                <button class="back-btn" data-target="screen-tipo-cuenta" aria-label="Volver">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+
+                <h1 class="screen-title">Registro de Arrendatario</h1>
+                <p class="screen-subtitle">Completa tus datos para crear tu cuenta.</p>
+
+                <div class="form-group">
+                    <label class="field-label" for="arr-username">Nombre de usuario</label>
+                    <input type="text" class="input-field" placeholder="Tu nombre de usuario" id="arr-username" autocomplete="username" />
                 </div>
 
                 <div class="form-group">
-                    <label class="field-label">Foto de tu cédula</label>
-                    <label for="register-cedula" class="file-upload-card" id="card-cedula">
-                        <button type="button" class="btn-remove-image" aria-label="Eliminar imagen" style="display: none;">&times;</button>
-                        <div class="upload-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                            </svg>
-                        </div>
-                        <span class="upload-text">Seleccionar foto de tu cédula</span>
-                        <span class="file-name">Ningún archivo seleccionado</span>
-                        <img src="" class="image-preview" alt="Vista previa cédula" hidden />
-                    </label>
-                    <input type="file" id="register-cedula" accept="image/jpeg,image/png,image/webp,image/gif" style="display: none;" />
-                    <p class="hint-text">JPG, PNG, WEBP o GIF · Máximo 4 MB</p>
+                    <label class="field-label" for="arr-email">Correo electrónico</label>
+                    <input type="email" class="input-field" placeholder="youremail@email.abc" id="arr-email" autocomplete="email" />
                 </div>
 
-                <button class="btn-primary" id="btn-register-submit">Enviar verificación</button>
+                <!-- Selector de tipo de identificación + campo de número -->
+                <div class="form-group">
+                    <label class="field-label" for="arr-id-type">Tipo de identificación</label>
+                    <select class="input-field" id="arr-id-type">
+                        <option value="CEDULA">Cédula de identidad</option>
+                        <option value="DIMEX">DIMEX</option>
+                        <option value="PASAPORTE">Pasaporte</option>
+                        <option value="CEDULA_JURIDICA">Cédula jurídica</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="field-label" for="arr-id-number">Número de identificación</label>
+                    <input type="text" class="input-field" placeholder="1-1234-5678" id="arr-id-number"
+                        inputmode="text" maxlength="20" autocomplete="off" />
+                </div>
+
+                <div class="form-group">
+                    <label class="field-label" for="arr-password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="input-field" placeholder="••••••••" id="arr-password" autocomplete="new-password" />
+                        <button class="toggle-eye" data-target="arr-password" aria-label="Mostrar contraseña">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="hint-text">Mínimo 8 caracteres</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="field-label" for="arr-confirm-password">Confirmar contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="input-field" placeholder="••••••••" id="arr-confirm-password" autocomplete="new-password" />
+                        <button class="toggle-eye" data-target="arr-confirm-password" aria-label="Mostrar contraseña">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="match-text" id="arr-match-msg"></p>
+                </div>
+
+                <button class="btn-primary" id="btn-arrendatario-submit">Crear cuenta</button>
+                <p class="field-error" id="error-arrendatario" hidden></p>
+            </div>
+
+
+            <!-- ════════════════════════════════════════════
+                 SCREEN 5c – REGISTRO ARRENDADOR (Verificación Biométrica)
+                 El flujo completo con selfie, cédula y validaciones faciales.
+            ════════════════════════════════════════════ -->
+            <div class="screen" id="screen-register">
+                <button class="back-btn" data-target="screen-tipo-cuenta" aria-label="Volver">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+
+                <h1 class="screen-title">Verificación de identidad <span class="role-badge">Arrendador</span></h1>
+                <p class="screen-subtitle">Sube tus fotos y verifica tu identificación.</p>
+
+                <!-- Selector de tipo de identificación + campo de número -->
+                <div class="id-fields-row">
+                    <div class="form-group">
+                        <label class="field-label" for="register-id-type">Tipo de ID</label>
+                        <select class="input-field" id="register-id-type">
+                            <option value="CEDULA">Cédula de identidad</option>
+                            <option value="DIMEX">DIMEX</option>
+                            <option value="PASAPORTE">Pasaporte</option>
+                            <option value="CEDULA_JURIDICA">Cédula jurídica</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="field-label" for="register-id-number">Número</label>
+                        <input type="text" class="input-field" placeholder="1-1234-5678"
+                            id="register-id-number" inputmode="text" maxlength="20" autocomplete="off" />
+                    </div>
+                </div>
+
+                <!-- Las dos fotos lado a lado para reducir altura total -->
+                <div class="photos-row">
+                    <div class="form-group">
+                        <label class="field-label">Selfie</label>
+                        <label for="register-selfie" class="file-upload-card file-upload-card--compact" id="card-selfie">
+                            <button type="button" class="btn-remove-image" aria-label="Eliminar imagen" style="display: none;">&times;</button>
+                            <div class="upload-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <span class="upload-text">Foto de tu cara</span>
+                            <span class="file-name">Ninguno</span>
+                            <img src="" class="image-preview" alt="Vista previa selfie" hidden />
+                        </label>
+                        <input type="file" id="register-selfie" accept="image/jpeg,image/png,image/webp,image/gif" style="display: none;" />
+                    </div>
+                    <div class="form-group">
+                        <label class="field-label">Foto del documento</label>
+                        <label for="register-cedula" class="file-upload-card file-upload-card--compact" id="card-cedula">
+                            <button type="button" class="btn-remove-image" aria-label="Eliminar imagen" style="display: none;">&times;</button>
+                            <div class="upload-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                </svg>
+                            </div>
+                            <span class="upload-text">Foto del documento</span>
+                            <span class="file-name">Ninguno</span>
+                            <img src="" class="image-preview" alt="Vista previa documento" hidden />
+                        </label>
+                        <input type="file" id="register-cedula" accept="image/jpeg,image/png,image/webp,image/gif" style="display: none;" />
+                    </div>
+                </div>
+                <p class="hint-text" style="text-align:center; margin-bottom: 4px;">JPG, PNG, WEBP o GIF &middot; Máx. 4 MB c/u</p>
+
+                <button class="btn-primary" id="btn-register-submit">Verificar identidad</button>
                 <p class="field-error" id="error-register" hidden></p>
+            </div>
+
+
+            <!-- ════════════════════════════════════════════
+                 SCREEN 6 – CREDENCIALES DE REGISTRO
+                 Solo se muestra cuando verifyFace Y verifyRegistroOficial
+                 retornan éxito. Aquí el usuario completa su cuenta.
+            ════════════════════════════════════════════ -->
+            <div class="screen" id="screen-credentials">
+                <button class="back-btn" data-target="screen-register" aria-label="Volver" id="back-btn-credentials">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+
+                <h1 class="screen-title">Crea tu cuenta</h1>
+                <p class="screen-subtitle">Identidad verificada ✓ Completa tus datos para finalizar el registro.</p>
+
+                <div class="form-group">
+                    <label class="field-label" for="reg-username">Nombre de usuario</label>
+                    <input type="text" class="input-field" placeholder="Tu nombre de usuario" id="reg-username" autocomplete="username" />
+                </div>
+
+                <div class="form-group">
+                    <label class="field-label" for="reg-email">Correo electrónico</label>
+                    <input type="email" class="input-field" placeholder="youremail@email.abc" id="reg-email" autocomplete="email" />
+                </div>
+
+                <div class="form-group">
+                    <label class="field-label" for="reg-password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="input-field" placeholder="••••••••" id="reg-password" autocomplete="new-password" />
+                        <button class="toggle-eye" data-target="reg-password" aria-label="Mostrar contraseña">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="hint-text">Debe tener al menos 8 caracteres</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="field-label" for="reg-confirm-password">Confirmar contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="input-field" placeholder="••••••••" id="reg-confirm-password" autocomplete="new-password" />
+                        <button class="toggle-eye" data-target="reg-confirm-password" aria-label="Mostrar contraseña">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="match-text" id="reg-match-msg"></p>
+                </div>
+
+                <button class="btn-primary" id="btn-credentials-submit">Crear cuenta</button>
+                <p class="field-error" id="error-credentials" hidden></p>
             </div>
 
         </main><!-- /panel-right -->
@@ -320,8 +526,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                 </svg>
             </div>
-            <h2 class="modal-title">Reinicio de contraseña<br>satisfactorio!</h2>
-            <p class="modal-body">Por favor reinicia sesión</p>
+            <h2 class="modal-title" id="modal-success-title">Cuenta creada<br>exitosamente!</h2>
+            <p class="modal-body" id="modal-success-body">Ya puedes iniciar sesión con tus credenciales.</p>
             <button class="btn-primary" id="btn-modal-done">Entendido</button>
         </div>
     </div>

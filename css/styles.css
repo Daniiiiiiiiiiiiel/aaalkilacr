@@ -825,6 +825,250 @@ input[type="password"]::-ms-clear {
 .panel-right:has(#screen-forgot.active),
 .panel-right:has(#screen-newpass.active),
 .panel-right:has(#screen-register.active),
+.panel-right:has(#screen-arrendatario.active),
+.panel-right:has(#screen-credentials.active),
+.panel-right:has(#screen-tipo-cuenta.active),
 .panel-right:has(#screen-otp.active) {
     overflow-y: hidden !important;
+}
+
+/* ── COMPACT DESIGN RULES TO PREVENT SCROLLING IN REGISTRATION FLOWS ── */
+
+/* Reducir márgenes y padding en pantallas de registro activas */
+.panel-right:has(#screen-arrendatario.active) .screen,
+.panel-right:has(#screen-register.active) .screen,
+.panel-right:has(#screen-credentials.active) .screen {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+/* Títulos y subtítulos más pequeños y compactos */
+.panel-right:has(#screen-arrendatario.active) .screen-title,
+.panel-right:has(#screen-register.active) .screen-title,
+.panel-right:has(#screen-credentials.active) .screen-title {
+    font-size: 18px;
+    margin-bottom: 2px;
+}
+
+.panel-right:has(#screen-arrendatario.active) .screen-subtitle,
+.panel-right:has(#screen-register.active) .screen-subtitle,
+.panel-right:has(#screen-credentials.active) .screen-subtitle {
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+
+/* Campos de formulario más pequeños */
+.panel-right:has(#screen-arrendatario.active) .form-group,
+.panel-right:has(#screen-register.active) .form-group,
+.panel-right:has(#screen-credentials.active) .form-group {
+    margin-bottom: 8px;
+}
+
+.panel-right:has(#screen-arrendatario.active) .field-label,
+.panel-right:has(#screen-register.active) .field-label,
+.panel-right:has(#screen-credentials.active) .field-label {
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.panel-right:has(#screen-arrendatario.active) .input-field,
+.panel-right:has(#screen-register.active) .input-field,
+.panel-right:has(#screen-credentials.active) .input-field {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 13px;
+    border-radius: 8px;
+}
+
+.panel-right:has(#screen-arrendatario.active) .btn-primary,
+.panel-right:has(#screen-register.active) .btn-primary,
+.panel-right:has(#screen-credentials.active) .btn-primary {
+    height: 40px;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.panel-right:has(#screen-arrendatario.active) .hint-text,
+.panel-right:has(#screen-register.active) .hint-text,
+.panel-right:has(#screen-credentials.active) .hint-text {
+    margin-top: 2px;
+    font-size: 10px;
+}
+
+.panel-right:has(#screen-arrendatario.active) .match-text,
+.panel-right:has(#screen-credentials.active) .match-text {
+    margin-top: 2px;
+    min-height: 12px;
+    font-size: 10px;
+}
+
+/* Fila de campos de identificación (Tipo + Número) */
+.id-fields-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 10px;
+}
+
+/* Fila para las dos fotos lado a lado en Arrendador */
+.photos-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* Estilo para los botones de eliminar foto en previsualización compacta */
+.file-upload-card--compact .btn-remove-image {
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+}
+
+/* Tarjeta de carga de archivo compacta */
+.file-upload-card.file-upload-card--compact {
+    min-height: 70px;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.file-upload-card--compact .upload-icon {
+    margin-bottom: 2px;
+}
+
+.file-upload-card--compact .upload-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.file-upload-card--compact .upload-text {
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+
+.file-upload-card--compact .file-name {
+    font-size: 9px;
+}
+
+/* Estilo select nativo alineado con el diseño general */
+select.input-field {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    padding-right: 32px;
+    cursor: pointer;
+}
+
+
+/* ══════════════════════════════════════════════
+   TIPO DE CUENTA – Tarjetas de selección
+   ══════════════════════════════════════════════ */
+
+/* Grid de dos columnas para las dos opciones de tipo de cuenta */
+.tipo-cuenta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+/* Tarjeta individual de selección de tipo de cuenta */
+.tipo-cuenta-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px 12px;
+    border: 2px solid var(--gray-border);
+    border-radius: 14px;
+    background: var(--white);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: var(--font);
+    text-align: center;
+    min-height: 140px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Estado hover: resalta con el azul primario */
+.tipo-cuenta-card:hover {
+    border-color: var(--blue);
+    background: rgba(26, 79, 160, 0.04);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 79, 160, 0.12);
+}
+
+/* Foco accesible por teclado */
+.tipo-cuenta-card:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+}
+
+/* Estado activo: feedback visual al hacer click */
+.tipo-cuenta-card:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Icono dentro de la tarjeta */
+.tipo-cuenta-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(26, 79, 160, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blue);
+    transition: background var(--transition), color var(--transition);
+    flex-shrink: 0;
+}
+
+.tipo-cuenta-card:hover .tipo-cuenta-icon {
+    background: var(--blue);
+    color: var(--white);
+}
+
+/* Nombre principal del tipo de cuenta */
+.tipo-cuenta-label {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+    transition: color var(--transition);
+}
+
+.tipo-cuenta-card:hover .tipo-cuenta-label {
+    color: var(--blue);
+}
+
+/* Descripción secundaria del tipo de cuenta */
+.tipo-cuenta-desc {
+    font-size: 11px;
+    color: var(--gray-text);
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+
+/* ── ROLE BADGE (aparece en el título de la pantalla de Arrendador) ── */
+/* Indica visualmente qué flujo está usando el usuario */
+.role-badge {
+    display: inline-block;
+    background: rgba(26, 79, 160, 0.10);
+    color: var(--blue);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    vertical-align: middle;
+    margin-left: 6px;
+    letter-spacing: 0.3px;
+    border: 1px solid rgba(26, 79, 160, 0.20);
 }

@@ -251,29 +251,159 @@ async function resetPassword(token, refreshToken, newPassword) {
 //
 //  POST /auth/rekognition
 //
-//  Envía:   { SourceImage64x: string, TargetImage64x: string, SimilarityThreshold: float }
-//  Espera:  200 OK  → { similarity: float }
+//  Envía:   { SourceImage64x: string, TargetImage64x: string, cedula: string }
+//  Espera:  200 OK  → { match: boolean, cedula_match: boolean, detail?: string }
 //           400     → { detail: string }
 //
-//  Compara una imagen origen (ej: documento) con una destino (ej: selfie) en Base64.
+//  Compara la selfie con la foto del documento en Base64 Y verifica que el
+//  número de cédula digitado coincida con el detectado en el documento.
+//
+//  La función lanza un Error descriptivo si:
+//    - El servidor responde con error HTTP
+//    - Las caras no coinciden (match === false)
+//    - La cédula no coincide (cedula_match === false)
+//  Solo retorna true cuando AMBAS condiciones son verdaderas.
 
-async function verifyFace(sourceBase64, targetBase64) {
+async function verifyFace(sourceBase64, targetBase64, identificationNumber) {
     const res = await safeFetch(`${API_BASE}/auth/rekognition`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             SourceImage64x: sourceBase64,
-            TargetImage64x: targetBase64
+            TargetImage64x: targetBase64,
+            cedula: identificationNumber    // Número de identificación digitado por el usuario
         })
     });
     const data = await res.json();
+
+    // Error HTTP del servidor (4xx / 5xx)
     if (!res.ok) {
         throw new Error(data.detail || 'No se pudo realizar la comparación facial.');
     }
+
+    // Validación 1: las dos fotografías deben pertenecer a la misma persona
     if (!data.match) {
-        throw new Error(data.detail || 'No coinciden las imagenes de su rostro');
+        throw new Error(data.detail || 'Las fotografías no coinciden. Asegúrate de subir tu selfie y tu documento correctamente.');
     }
-    return data.match; // true = pasó, false = no pasó
+
+    // Validación 2: el número de identificación digitado debe coincidir con el detectado en el documento
+    if (!data.cedula_match) {
+        throw new Error(data.detail || 'El número de identificación ingresado no coincide con el del documento fotografiado.');
+    }
+
+    // Ambas validaciones pasaron → retorna true
+    return true;
+}
+
+
+// ── verifyRegistroOficial ─────────────────────────────────────────────────────
+//
+//  POST /auth/verify-registro
+//
+//  Esta función es independiente de verifyFace y se ejecuta DESPUÉS de que
+//  verifyFace retorne éxito. Su único propósito es consultar al backend si la
+//  persona fue encontrada y validada en el registro oficial correspondiente
+//  (ej: padrón electoral, Registro Civil).
+//
+//  Envía:   { cedula: string }  (la cédula previamente validada)
+//  Espera:  200 OK  → { encontrado: boolean }
+//           400     → { detail: string }
+//
+//  Lanza un Error si la persona NO fue encontrada en el registro oficial,
+//  bloqueando el avance al siguiente paso del registro.
+
+async function verifyRegistroOficial(identificationNumber, identificationType = 'CEDULA') {
+    const res = await safeFetch(`${API_BASE}/auth/verify-registro`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            identificationNumber,   // Número del documento
+            identificationType      // Tipo: CEDULA, DIMEX, PASAPORTE, CEDULA_JURIDICA
+        })
+    });
+    const data = await res.json();
+
+    // Error HTTP del servidor
+    if (!res.ok) {
+        throw new Error(data.detail || 'No se pudo consultar el registro oficial.');
+    }
+
+    // El backend indica si la persona fue encontrada en el registro oficial
+    if (!data.encontrado) {
+        throw new Error(data.detail || 'No se encontró tu identificación en el registro oficial. Verifica el número ingresado.');
+    }
+
+    // Persona validada en el registro oficial → retorna true
+    return true;
+}
+
+
+// ── registerArrendatario ──────────────────────────────────────────────────────
+//
+//  POST /auth/register
+//
+//  Registra un usuario de tipo Arrendatario. No requiere verificación facial.
+//  Envía:   { username, email, password, identificationType, identificationNumber, role }
+//  Espera:  200 OK  → { success: boolean }
+//           400     → { detail: string }
+
+async function registerArrendatario(username, email, password, identificationType, identificationNumber) {
+    const res = await safeFetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username,
+            email,
+            password,
+            identificationType,     // Tipo de documento: CEDULA, DIMEX, PASAPORTE, etc.
+            identificationNumber,   // Número del documento
+            role: 'arrendatario'    // Indica al backend el tipo de cuenta
+        })
+    });
+    const data = await res.json();
+
+    // Error HTTP: cuenta duplicada, datos inválidos, etc.
+    if (!res.ok) {
+        throw new Error(data.detail || 'No se pudo crear la cuenta. Intenta de nuevo.');
+    }
+
+    return true; // Registro exitoso
+}
+
+
+// ── registerArrendador ───────────────────────────────────────────────────────
+//
+//  POST /auth/register
+//
+//  Registra un usuario de tipo Arrendador. Es equivalente a registerArrendatario
+//  pero incluye el rol 'arrendador'. Se llama DESPUÉS de que todas las
+//  validaciones biométricas hayan sido exitosas (verifyFace + verifyRegistroOficial).
+//
+//  Envía:   { username, email, password, identificationType, identificationNumber, role }
+//  Espera:  200 OK  → { success: boolean }
+//           400     → { detail: string }
+
+async function registerArrendador(username, email, password, identificationType, identificationNumber) {
+    const res = await safeFetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username,
+            email,
+            password,
+            identificationType,     // Tipo de documento: CEDULA, DIMEX, PASAPORTE, etc.
+            identificationNumber,   // Número del documento (ya validado biométricamente)
+            role: 'arrendador'      // Indica al backend el tipo de cuenta
+        })
+    });
+    const data = await res.json();
+
+    // Error HTTP: cuenta duplicada, datos inválidos, etc.
+    if (!res.ok) {
+        throw new Error(data.detail || 'No se pudo crear la cuenta. Intenta de nuevo.');
+    }
+
+    return true; // Registro exitoso
 }
 
 
