@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AALkilaCR</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/dashboard.css?v=1.1">
+</head>
+
+<body>
+    <!-- ── HEADER ── -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            <img src="../../assets/logo_2.png" alt="AALkilaCR" class="logo-img" />
+            <div class="header-divider"></div>
+            <div class="header-greeting">¡Hola! Alex, bienvenido.</div>
+        </div>
+        <div class="header-right">
+            <button class="btn-publish">Publicar Propiedad</button>
+            <button class="notification-bell" aria-label="Notificaciones">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span class="bell-badge"></span>
+            </button>
+            <div class="user-profile">
+                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80" alt="Avatar" class="avatar-img" />
+            </div>
+        </div>
+    </header>
+
+    <!-- ── LAYOUT WRAPPER ── -->
+    <div class="dashboard-layout">
+        <!-- ── SIDEBAR ── -->
+        <aside class="dashboard-sidebar">
+            <nav>
+                <ul class="sidebar-menu">
+                    <li class="menu-item active">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                            </svg>
+                            Inicio
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            Buscar
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            Chat
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            Favoritos
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Mi Perfil
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout-sidebar" id="btn-logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- ── MAIN CONTENT ── -->
+        <main class="dashboard-main">
+            <!-- ── SECCIÓN 1: INICIO ── -->
+            <div class="dashboard-section active" id="section-inicio">
+                <h1 class="main-headline">Encuentra tu próximo hogar, fácil y tico!</h1>
+                <div class="content-container">
+                    <!-- Buscador / Card -->
+                    <div class="search-section">
+                        <!-- Tabs -->
+                        <div class="tab-group">
+                            <button class="tab-btn active">Alquiler</button>
+                            <button class="tab-btn">Venta</button>
+                        </div>
+
+                        <!-- Search Fields Bar -->
+                        <div class="search-bar">
+                            <!-- Propiedad -->
+                            <div class="search-field select-field">
+                                <span class="field-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                </span>
+                                <select class="search-select">
+                                    <option>Apartamento</option>
+                                    <option>Casa</option>
+                                    <option>Estudio</option>
+                                </select>
+                            </div>
+
+                            <!-- Ubicación -->
+                            <div class="search-field select-field">
+                                <span class="field-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </span>
+                                <select class="search-select">
+                                    <option>Ubicación</option>
+                                    <option>San José</option>
+                                    <option>Desamparados</option>
+                                    <option>Gravilias</option>
+                                </select>
+                            </div>
+
+                            <!-- Min Price -->
+                            <div class="search-field no-arrow">
+                                <span class="field-icon" style="font-weight: 800; font-size: 16px;">₡</span>
+                                <input type="text" class="price-input" placeholder="Mín" />
+                            </div>
+
+                            <!-- Max Price -->
+                            <div class="search-field no-arrow">
+                                <span class="field-icon" style="font-weight: 800; font-size: 16px;">₡</span>
+                                <input type="text" class="price-input" placeholder="Máx" />
+                            </div>
+
+                            <!-- Search Button -->
+                            <button class="btn-search">Buscar</button>
+
+                            <!-- Filter Detail Button -->
+                            <button class="btn-filter-icon" aria-label="Filtros avanzados">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sorting row desktop -->
+                    <div class="sorting-row">
+                        <span class="sorting-label">Ordenar por:</span>
+                        <div class="sorting-select-wrapper">
+                            <select class="sorting-select">
+                                <option>Menor Precio</option>
+                                <option>Mayor Precio</option>
+                                <option>Recientes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Filters & Sorting Row -->
+                    <div class="mobile-filters-row">
+                        <div class="mobile-sorting-wrapper">
+                            <select>
+                                <option>Menor Precio</option>
+                                <option>Mayor Precio</option>
+                                <option>Recientes</option>
+                            </select>
+                        </div>
+                        <button class="mobile-btn-filter">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                            Filtros
+                        </button>
+                    </div>
+
+                    <!-- Properties Grid/Carousel -->
+                    <div class="properties-carousel-wrapper">
+                        <div class="properties-grid">
+                            <!-- Card 1 -->
+                            <div class="property-card">
+                                <div class="card-img-wrapper">
+                                    <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80" alt="Apartamento Gravilias" class="card-img" />
+                                </div>
+                                <div class="card-content">
+                                    <div class="card-header-row">
+                                        <h2 class="card-title">Moderno Apartamento en Gravilias</h2>
+                                        <span class="price-badge">₡275,000</span>
+                                    </div>
+                                    <div class="card-location">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        Gravilias, Desamparados
+                                    </div>
+                                    <div class="card-specs">
+                                        <span class="spec-item" title="Dormitorios">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10V19M21 10V19M3 14H21M3 10C3 7 6 7 12 7S21 7 21 10M5 7V10M19 7V10" />
+                                            </svg>
+                                            3
+                                        </span>
+                                        <span class="spec-item" title="Baños">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M6 10v10a1 1 0 001 1h10a1 1 0 001-1V10M10 6a2 2 0 114 0v4H10V6z" />
+                                            </svg>
+                                            1
+                                        </span>
+                                        <span class="spec-item" title="Parqueos">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10V8a3 3 0 013-3h8a3 3 0 013 3v2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0H5m4 4h.01M15 14h.01" />
+                                            </svg>
+                                            1
+                                        </span>
+                                        <span class="spec-item" title="Área">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V16M4 16H12M4 12H8M12 12V16M16 12V16M20 8V16M20 16H12M20 12H16" />
+                                            </svg>
+                                            49M
+                                        </span>
+                                        <span class="spec-item" title="Personas">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            5
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2 -->
+                            <div class="property-card">
+                                <div class="card-img-wrapper">
+                                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80" alt="Apartamento Torre" class="card-img" />
+                                </div>
+                                <div class="card-content">
+                                    <div class="card-header-row">
+                                        <h2 class="card-title">Amplio Apartamento en Torre</h2>
+                                        <span class="price-badge">₡325,000</span>
+                                    </div>
+                                    <div class="card-location">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        San José
+                                    </div>
+                                    <div class="card-specs">
+                                        <span class="spec-item" title="Dormitorios">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10V19M21 10V19M3 14H21M3 10C3 7 6 7 12 7S21 7 21 10M5 7V10M19 7V10" />
+                                            </svg>
+                                            2
+                                        </span>
+                                        <span class="spec-item" title="Baños">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M6 10v10a1 1 0 001 1h10a1 1 0 001-1V10M10 6a2 2 0 114 0v4H10V6z" />
+                                            </svg>
+                                            1
+                                        </span>
+                                        <span class="spec-item" title="Parqueos">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10V8a3 3 0 013-3h8a3 3 0 013 3v2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0H5m4 4h.01M15 14h.01" />
+                                            </svg>
+                                            1
+                                        </span>
+                                        <span class="spec-item" title="Área">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V16M4 16H12M4 12H8M12 12V16M16 12V16M20 8V16M20 16H12M20 12H16" />
+                                            </svg>
+                                            48M
+                                        </span>
+                                        <span class="spec-item" title="Personas">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            5
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 3 -->
+                            <div class="property-card">
+                                <div class="card-img-wrapper">
+                                    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80" alt="Apto céntrico Desamparados" class="card-img" />
+                                </div>
+                                <div class="card-content">
+                                    <div class="card-header-row">
+                                        <h2 class="card-title">Apto céntrico en Desamparados</h2>
+                                        <span class="price-badge">₡245,000</span>
+                                    </div>
+                                    <div class="card-location">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        Desamparados
+                                    </div>
+                                    <div class="card-specs">
+                                        <span class="spec-item" title="Dormitorios">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10V19M21 10V19M3 14H21M3 10C3 7 6 7 12 7S21 7 21 10M5 7V10M19 7V10" />
+                                            </svg>
+                                            2
+                                        </span>
+                                        <span class="spec-item" title="Baños">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M6 10v10a1 1 0 001 1h10a1 1 0 001-1V10M10 6a2 2 0 114 0v4H10V6z" />
+                                            </svg>
+                                            1
+                                        </span>
+                                        <span class="spec-item" title="Parqueos">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10V8a3 3 0 013-3h8a3 3 0 013 3v2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0H5m4 4h.01M15 14h.01" />
+                                            </svg>
+                                            1
+                                        </span>
+                                        <span class="spec-item" title="Área">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V16M4 16H12M4 12H8M12 12V16M16 12V16M20 8V16M20 16H12M20 12H16" />
+                                            </svg>
+                                            45M
+                                        </span>
+                                        <span class="spec-item" title="Personas">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            5
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Next Button Carousel -->
+                        <button class="carousel-btn-next" aria-label="Siguiente propiedad">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── SECCIÓN 2: BUSCAR (STUB VACIÓ) ── -->
+            <div class="dashboard-section" id="section-buscar">
+                <div class="content-container">
+                    <p style="color: var(--text-muted); font-weight: 700; text-align: center; padding: 40px 0;">Buscador avanzado en desarrollo...</p>
+                </div>
+            </div>
+
+            <!-- ── SECCIÓN 3: CHAT (STUB VACIÓ) ── -->
+            <div class="dashboard-section" id="section-chat">
+                <div class="content-container">
+                    <p style="color: var(--text-muted); font-weight: 700; text-align: center; padding: 40px 0;">Modulo de Mensajería próximamente...</p>
+                </div>
+            </div>
+
+            <!-- ── SECCIÓN 4: FAVORITOS (STUB VACIÓ) ── -->
+            <div class="dashboard-section" id="section-favoritos">
+                <div class="content-container">
+                    <p style="color: var(--text-muted); font-weight: 700; text-align: center; padding: 40px 0;">Tus propiedades favoritas aparecerán aquí...</p>
+                </div>
+            </div>
+
+            <!-- ── SECCIÓN 5: MI PERFIL (COMPLETO) ── -->
+            <div class="dashboard-section" id="section-perfil">
+                <!-- VISTA 5a: MENÚ PRINCIPAL DEL PERFIL (Image 1) -->
+                <div class="profile-subpage active" id="profile-home">
+                    <h1 class="main-headline">Mi Perfil</h1>
+                    <div class="content-container">
+                        <!-- Card de Perfil del Usuario -->
+                        <div class="profile-card-container">
+                            <div class="profile-banner">
+                                <button class="btn-change-photo">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Change Photo
+                                </button>
+                            </div>
+                            <div class="profile-card-body">
+                                <div class="profile-avatar-wrapper">
+                                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80" alt="Alex Villalobos" class="profile-avatar-img avatar-img" />
+                                </div>
+                                <div class="profile-name-section">
+                                    <h2 class="profile-fullname">Alex Villalobos</h2>
+                                    <div class="profile-actions-wrapper">
+                                        <button class="btn-actions-trigger" aria-label="Opciones de perfil">•••</button>
+                                        <div class="profile-dropdown-menu">
+                                            <button class="dropdown-item">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                </svg>
+                                                Editar Perfil
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="profile-contact-grid">
+                                    <div class="contact-item">
+                                        <span class="contact-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                            </svg>
+                                        </span>
+                                        <div class="contact-info">
+                                            <span class="contact-val">+506 2123 8925</span>
+                                            <span class="contact-lbl">Celular</span>
+                                        </div>
+                                    </div>
+                                    <div class="contact-item">
+                                        <span class="contact-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                        </span>
+                                        <div class="contact-info">
+                                            <span class="contact-val">email925@gmail.com</span>
+                                            <span class="contact-lbl">Email</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grid de Navegación del Perfil -->
+                        <div class="profile-menu-grid">
+                            <button class="profile-menu-card" id="btn-goto-publish">
+                                <div class="profile-menu-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9" />
+                                    </svg>
+                                </div>
+                                <span class="profile-menu-lbl">Publicar Propiedad</span>
+                            </button>
+                            <button class="profile-menu-card" id="btn-goto-manage">
+                                <div class="profile-menu-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </div>
+                                <span class="profile-menu-lbl">Administrar Propiedad</span>
+                            </button>
+                            <button class="profile-menu-card" id="btn-goto-config">
+                                <div class="profile-menu-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                                <span class="profile-menu-lbl">Configuraciones</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISTA 5b: FORMULARIO PUBLICAR PROPIEDAD (multipaso, Images 2, 3, 4) -->
+                <div class="profile-subpage" id="profile-publish">
+                    <!-- Barra Azul Superior -->
+                    <div class="subpage-header-bar">
+                        <button class="btn-subpage-back" data-target="profile-home">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <span class="subpage-title">Publicar Propiedad</span>
+                    </div>
+
+                    <div class="content-container">
+                        <h2 class="form-section-headline">¡Cuéntanos de tu propiedad!</h2>
+                        
+                        <!-- Pestañas del Formulario Multipaso -->
+                        <div class="form-steps-nav">
+                            <button class="step-nav-btn active" data-step="1">1. Datos Generales</button>
+                            <button class="step-nav-btn" data-step="2">2. Descripción & Fotos</button>
+                            <button class="step-nav-btn" data-step="3">3. Ubicación</button>
+                        </div>
+
+                        <!-- Multipaso Form Container -->
+                        <form id="form-publish-property" novalidate>
+                            <!-- PASO 1: Datos Generales (Image 2) -->
+                            <div class="form-step-content active" id="publish-step-1">
+                                <div class="form-grid-2col">
+                                    <div class="form-group-row">
+                                        <span class="row-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                        </span>
+                                        <label class="form-row-label">Tipo Negocio:</label>
+                                        <select class="form-row-select">
+                                            <option>Alquiler</option>
+                                            <option>Venta</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group-row">
+                                        <span class="row-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                            </svg>
+                                        </span>
+                                        <label class="form-row-label">Tipo Propiedad:</label>
+                                        <select class="form-row-select">
+                                            <option>Apartamento</option>
+                                            <option>Casa</option>
+                                            <option>Estudio</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Valores -->
+                                <div class="form-block-section">
+                                    <h3 class="block-title">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle; display:inline-block;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Valores
+                                    </h3>
+                                    <div class="form-grid-2col">
+                                        <div class="form-inline-field">
+                                            <label class="inline-label">Valor mensual:</label>
+                                            <div class="inline-input-group">
+                                                <select class="currency-select"><option>Colones</option><option>Dólares</option></select>
+                                                <input type="text" class="form-inline-input" placeholder="Ingrese el valor" />
+                                            </div>
+                                        </div>
+                                        <div class="form-inline-field">
+                                            <label class="inline-label">Cuota Administración:</label>
+                                            <div class="inline-input-group">
+                                                <label class="switch-toggle"><input type="checkbox" checked /><span class="switch-slider"></span></label>
+                                                <input type="text" class="form-inline-input" placeholder="Ingrese el valor" />
+                                            </div>
+                                        </div>
+                                        <div class="form-inline-field">
+                                            <label class="inline-label">Depósito:</label>
+                                            <div class="inline-input-group">
+                                                <label class="switch-toggle"><input type="checkbox" checked /><span class="switch-slider"></span></label>
+                                                <input type="text" class="form-inline-input" placeholder="Ingrese el valor" />
+                                            </div>
+                                        </div>
+                                        <div class="form-inline-field">
+                                            <label class="inline-label">Comentario:</label>
+                                            <input type="text" class="form-inline-input" placeholder="[Negociable, en tractos, etc]" style="width:100%;" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pet Friendly -->
+                                <div class="form-block-section">
+                                    <h3 class="block-title">🐾 Pet Friendly</h3>
+                                    <div class="form-grid-2col">
+                                        <div class="form-inline-field">
+                                            <label class="inline-label">Acepta mascotas:</label>
+                                            <div class="inline-input-group">
+                                                <label class="switch-toggle"><input type="checkbox" checked /><span class="switch-slider"></span></label>
+                                                <select class="pet-select"><option>Perros</option><option>Gatos</option><option>Ambos</option></select>
+                                            </div>
+                                        </div>
+                                        <div class="form-inline-field">
+                                            <label class="inline-label">Comentario:</label>
+                                            <input type="text" class="form-inline-input" placeholder="[Tamaño, características]" style="width:100%;" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tamaño & Antigüedad -->
+                                <div class="form-grid-2col">
+                                    <div class="form-block-section">
+                                        <h3 class="block-title">✛ Tamaño Propiedad</h3>
+                                        <div class="form-inline-field no-grid">
+                                            <label class="inline-label">Área construida:</label>
+                                            <div class="inline-input-group">
+                                                <input type="text" class="form-inline-input" placeholder="Ingrese el valor en m2" style="width:140px;" />
+                                                <span class="unit-lbl">M2</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-block-section">
+                                        <h3 class="block-title">🏢 Antigüedad Propiedad</h3>
+                                        <div class="form-inline-field no-grid">
+                                            <label class="inline-label">Años construcción:</label>
+                                            <select class="age-select"><option>0-3 años</option><option>4-10 años</option><option>10+ años</option></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Características -->
+                                <div class="form-block-section">
+                                    <h3 class="block-title">🏛️ Características Propiedad</h3>
+                                    <div class="features-grid-publish">
+                                        <div class="feature-inline-group">
+                                            <label class="feature-lbl">N° Habitaciones:</label>
+                                            <select class="feature-select"><option>2</option><option>1</option><option>3</option><option>4+</option></select>
+                                        </div>
+                                        <div class="feature-inline-group">
+                                            <label class="feature-lbl">N° Parqueos:</label>
+                                            <select class="feature-select"><option>2</option><option>1</option><option>0</option><option>3+</option></select>
+                                        </div>
+                                        <div class="feature-inline-group">
+                                            <label class="feature-lbl">N° Baños completos:</label>
+                                            <select class="feature-select"><option>1</option><option>2</option><option>3</option></select>
+                                        </div>
+                                        <div class="feature-inline-group">
+                                            <label class="feature-lbl">Medio baño:</label>
+                                            <label class="switch-toggle"><input type="checkbox" checked /><span class="switch-slider"></span></label>
+                                        </div>
+                                        <div class="feature-inline-group">
+                                            <label class="feature-lbl">Cantidad Pisos:</label>
+                                            <select class="feature-select"><option>2</option><option>1</option><option>3</option></select>
+                                            <span class="info-bubble" title="Pisos totales del inmueble">i</span>
+                                        </div>
+                                        <div class="feature-inline-group">
+                                            <label class="feature-lbl">N° Piso Inmueble:</label>
+                                            <select class="feature-select"><option>1</option><option>2</option><option>3</option></select>
+                                            <span class="info-bubble" title="Piso en el que se ubica la propiedad">i</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-step-actions" style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                                    <button type="button" class="btn-primary btn-next-step" data-next="2" style="max-width: 200px;">Continuar</button>
+                                </div>
+                            </div>
+
+                            <!-- PASO 2: Descripción & Fotos (Image 3) -->
+                            <div class="form-step-content" id="publish-step-2">
+                                <!-- Descripción -->
+                                <div class="form-block-section">
+                                    <h3 class="block-title">💬 Descripción Propiedad</h3>
+                                    <div class="form-group-stacked">
+                                        <label class="stacked-lbl">Título para anuncio:</label>
+                                        <input type="text" class="form-stacked-input" placeholder="Título" style="max-width:320px;" />
+                                    </div>
+                                    <div class="form-group-stacked" style="margin-top:14px;">
+                                        <label class="stacked-lbl">Descripción Inmueble: <span class="info-bubble" title="Detalles atractivos sobre la propiedad">i</span></label>
+                                        <textarea class="form-stacked-textarea" rows="4">Vivi con comodidad y en una ubicación estratégica. Este apartamento se encuentra cerca de todos los comercios, servicios y transporte. Ideal para quienes buscan practicidad en su dia a dia.</textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Requisitos -->
+                                <div class="form-block-section">
+                                    <h3 class="block-title">📋 Lista Requisitos</h3>
+                                    <div class="form-group-stacked">
+                                        <textarea class="form-stacked-textarea" rows="3" placeholder="[Menciona los principales requisitos del inquilino]"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Fotos -->
+                                <div class="form-block-section">
+                                    <h3 class="block-title">📷 Fotos de la Propiedad</h3>
+                                    <div class="property-photos-uploader">
+                                        <div class="uploader-box">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--text-muted); margin-bottom:8px;">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span class="uploader-txt">[Sube las fotos aquí]</span>
+                                        </div>
+                                        <span class="uploader-limits">Mínimo 1 foto | Máximo 20 fotos</span>
+                                    </div>
+                                </div>
+                                <div class="form-step-actions" style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                                    <button type="button" class="btn-primary btn-next-step" data-next="3" style="max-width: 200px;">Continuar</button>
+                                </div>
+                            </div>
+
+                            <!-- PASO 3: Ubicación (Image 4) -->
+                            <div class="form-step-content" id="publish-step-3">
+                                <div class="form-block-section">
+                                    <h3 class="block-title">📍 Ubicación de la Propiedad</h3>
+                                    <div class="form-group-stacked">
+                                        <label class="stacked-lbl">Dirección o punto de referencia: <span class="info-bubble" title="Dirección exacta o puntos clave de referencia">i</span></label>
+                                        <div class="map-search-wrapper">
+                                            <span class="map-search-icon">🔍</span>
+                                            <input type="text" class="map-search-input" placeholder="[Ejm: Moravia]" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Mapa Simulado -->
+                                    <div class="map-canvas-container">
+                                        <div class="mock-map-bg">
+                                            <!-- Pins simulados -->
+                                            <div class="map-pin pin-1" style="top:30%; left:30%;"></div>
+                                            <div class="map-pin pin-2" style="top:50%; left:45%;"></div>
+                                            <div class="map-pin pin-3" style="top:25%; left:65%;"></div>
+                                            <div class="map-pin pin-4" style="top:60%; left:70%;"></div>
+                                            <!-- Botones del Mapa -->
+                                            <button type="button" class="btn-map-control btn-close-map">Cerrar el mapa ✕</button>
+                                            <button type="button" class="btn-map-control btn-recenter-map">Volver a centrar ⟲</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fila de Botones del Formulario -->
+                                <div class="form-publish-actions" style="margin-top: 24px;">
+                                    <button type="submit" class="btn-submit-publish btn-primary" style="max-width: 200px; margin-left: auto; display: block;">Enviar Publicación</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- VISTA 5c: ADMINISTRAR PROPIEDADES (Image 5) -->
+                <div class="profile-subpage" id="profile-manage">
+                    <!-- Barra Azul Superior -->
+                    <div class="subpage-header-bar">
+                        <button class="btn-subpage-back" data-target="profile-home">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <span class="subpage-title">Administrar Propiedad</span>
+                    </div>
+
+                    <div class="content-container">
+                        <h2 class="form-section-headline">¡Administra tu propiedad!</h2>
+                        
+                        <div class="manage-filters-row">
+                            <div class="form-group-row compact">
+                                <span class="row-icon">💼</span>
+                                <label class="form-row-label">Tipo Negocio:</label>
+                                <select class="form-row-select">
+                                    <option>Alquiler</option>
+                                    <option>Venta</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Propiedades en Administración -->
+                        <div class="manage-properties-list">
+                            <!-- Propiedad 1: Detalle a la Derecha -->
+                            <div class="manage-property-row">
+                                <div class="manage-card-visual">
+                                    <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=400&q=80" alt="Moderno Apartamento en Gravilias" class="manage-img" />
+                                    <div class="manage-card-meta">
+                                        <h3 class="manage-title">Moderno Apartamento en Gravilias</h3>
+                                        <span class="manage-location">📍 Gravilias, Desamparados</span>
+                                        <span class="manage-price">₡275,000</span>
+                                        <div class="manage-specs-icons">
+                                            <span>🛏️ 3</span>
+                                            <span>🛁 1</span>
+                                            <span>🚗 1</span>
+                                            <span>📐 48M</span>
+                                            <span>👥 SI</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="manage-card-details">
+                                    <div class="details-grid">
+                                        <div class="detail-field">
+                                            <span class="detail-lbl">Código Inmueble:</span>
+                                            <span class="detail-val code-value">COD1258356 <button class="btn-edit-code" aria-label="Editar código">✏️</button></span>
+                                        </div>
+                                        <div class="detail-field">
+                                            <span class="detail-lbl">Estado Publicación:</span>
+                                            <span class="detail-val status-badge status-review">En Revisión</span>
+                                        </div>
+                                        <div class="detail-field">
+                                            <span class="detail-lbl">Fecha:</span>
+                                            <span class="detail-val">12-03-2026</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn-cancel-publish">Cancelar Publicación</button>
+                                </div>
+                            </div>
+
+                            <!-- Propiedad 2: Detalle a la Izquierda (Alternado) -->
+                            <div class="manage-property-row row-reverse">
+                                <div class="manage-card-visual">
+                                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=400&q=80" alt="Amplio Apartamento en Torre" class="manage-img" />
+                                    <div class="manage-card-meta">
+                                        <h3 class="manage-title">Amplio Apartamento en Torre</h3>
+                                        <span class="manage-location">📍 San José</span>
+                                        <span class="manage-price">₡325,000</span>
+                                        <div class="manage-specs-icons">
+                                            <span>🛏️ 3</span>
+                                            <span>🛁 1</span>
+                                            <span>🚗 1</span>
+                                            <span>📐 48M</span>
+                                            <span>👥 SI</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="manage-card-details">
+                                    <div class="details-grid">
+                                        <div class="detail-field">
+                                            <span class="detail-lbl">Código Inmueble:</span>
+                                            <span class="detail-val code-value">COD1259463 <button class="btn-edit-code" aria-label="Editar código">✏️</button></span>
+                                        </div>
+                                        <div class="detail-field">
+                                            <span class="detail-lbl">Estado Publicación:</span>
+                                            <span class="detail-val status-badge status-approved">Aprobado</span>
+                                        </div>
+                                        <div class="detail-field">
+                                            <span class="detail-lbl">Fecha:</span>
+                                            <span class="detail-val">18-03-2026</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn-cancel-publish">Cancelar Publicación</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISTA 5d: CONFIGURACIONES (STUB VACIÓ) -->
+                <div class="profile-subpage" id="profile-config">
+                    <!-- Barra Azul Superior -->
+                    <div class="subpage-header-bar">
+                        <button class="btn-subpage-back" data-target="profile-home">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <span class="subpage-title">Configuraciones</span>
+                    </div>
+                    <div class="content-container">
+                        <p style="color: var(--text-muted); font-weight: 700; text-align: center; padding: 40px 0;">Opciones de configuración de la cuenta en desarrollo...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/core.js?v=1.1"></script>
+    <script src="../auth/js/api.js?v=1.1"></script>
+    <script src="js/api.js?v=1.1"></script>
+    <script src="js/ui.js?v=1.1"></script>
+    <script src="js/app.js?v=1.1"></script>
+</body>
+
+</html>
